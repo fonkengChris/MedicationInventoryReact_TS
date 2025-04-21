@@ -23,9 +23,16 @@ const Register = () => {
   const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // Format phone number if it's the phone field and starts with '0'
+    if (e.target.name === "phoneNumber" && value.startsWith("0")) {
+      value = "+44" + value.substring(1);
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   };
 
@@ -113,6 +120,7 @@ const Register = () => {
                 pattern: "^\\+44[0-9]{10}$",
               }}
               placeholder="Enter your phone number (+44)"
+              helperText="Example: +441234567890"
               sx={{ mb: 2 }}
             />
 

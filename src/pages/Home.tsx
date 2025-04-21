@@ -4,7 +4,13 @@ import {
   activeMedicationApi,
   appointmentApi,
 } from "../services/api";
-import { ServiceUser, ActiveMedication, Appointment } from "../types/models";
+import {
+  ServiceUser,
+  ActiveMedication,
+  Appointment,
+  User,
+  Group,
+} from "../types/models";
 import {
   FormControl,
   InputLabel,
@@ -60,6 +66,7 @@ const Home = () => {
     status: "Scheduled",
     notes: "",
   });
+  const [notes, setNotes] = useState<string>("");
 
   const { data: serviceUsers = [], isLoading: isLoadingUsers } =
     useServiceUsers();
@@ -67,6 +74,17 @@ const Home = () => {
     useActiveMedications();
   const { data: appointments = [], refetch: fetchAppointments } =
     useAppointments();
+
+  // Filter service users based on user's role and group
+  const filteredServiceUsers = React.useMemo(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return [];
+
+    const decodedToken = jwtDecode<User>(token);
+    if (decodedToken.role === "admin") return serviceUsers;
+
+    return serviceUsers;
+  }, [serviceUsers]);
 
   const filteredMedications = activeMedications.filter(
     (med) => (med.serviceUser as any)._id === selectedUser && med.isActive
@@ -92,10 +110,12 @@ const Home = () => {
     try {
       await activeMedicationApi.update(selectedMedication._id, {
         quantityInStock: selectedMedication.quantityInStock + quantity,
+        stockChangeNote: notes,
       });
       await fetchActiveMedications();
       setIsModalOpen(false);
       setQuantity(0);
+      setNotes("");
     } catch (error) {
       console.error("Failed to update stock:", error);
     }
@@ -114,10 +134,12 @@ const Home = () => {
     try {
       await activeMedicationApi.update(selectedMedication._id, {
         quantityInStock: selectedMedication.quantityInStock - quantity,
+        stockChangeNote: notes,
       });
       await fetchActiveMedications();
       setIsModalOpen(false);
       setQuantity(0);
+      setNotes("");
     } catch (error) {
       console.error("Failed to serve medication:", error);
     }
@@ -166,19 +188,31 @@ const Home = () => {
         </Typography>
 
         <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel id="service-user-label">Service User</InputLabel>
+          <InputLabel id="service-user-label">
+            {localStorage.getItem("token")
+              ? "Service User"
+              : "Please log in to view service users"}
+          </InputLabel>
           <Select
             labelId="service-user-label"
             value={selectedUser}
-            label="Service User"
+            label={
+              localStorage.getItem("token")
+                ? "Service User"
+                : "Please log in to view service users"
+            }
             onChange={handleUserChange}
-            disabled={isLoadingUsers}
+            disabled={!localStorage.getItem("token") || isLoadingUsers}
           >
-            {serviceUsers.map((user) => (
-              <MenuItem key={user._id} value={user._id}>
-                {user.name}
-              </MenuItem>
-            ))}
+            {localStorage.getItem("token") ? (
+              filteredServiceUsers.map((user) => (
+                <MenuItem key={user._id} value={user._id}>
+                  {user.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>Please log in to view service users</MenuItem>
+            )}
           </Select>
         </FormControl>
 
@@ -300,7 +334,7 @@ const Home = () => {
                   <TableCell>Frequency</TableCell>
                   <TableCell>Start Date</TableCell>
                   <TableCell>Prescribed By</TableCell>
-                  <TableCell>Notes</TableCell>
+                  <TableCell>Instructions</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -315,7 +349,7 @@ const Home = () => {
                       {new Date(medication.startDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell>{medication.prescribedBy}</TableCell>
-                    <TableCell>{medication.notes}</TableCell>
+                    <TableCell>{medication.instructions}</TableCell>
                     <TableCell>
                       <Tooltip title="Add Stock">
                         <IconButton
@@ -432,6 +466,35 @@ const Home = () => {
             onChange={(e) => setQuantity(Number(e.target.value))}
             sx={{ my: 2 }}
           />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Notes</InputLabel>
+            <Select
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              label="Notes"
+            >
+              <MenuItem value="Stock received from pharmacy">
+                Stock received from pharmacy
+              </MenuItem>
+              <MenuItem value="Stock count correction">
+                Stock count correction
+              </MenuItem>
+              <MenuItem value="Medication administered">
+                Medication administered
+              </MenuItem>
+              <MenuItem value="Medication leaving the home">
+                Medication leaving the home
+              </MenuItem>
+              <MenuItem value="Medication returned home">
+                Medication returned home
+              </MenuItem>
+              <MenuItem value="Medication returned to pharmacy">
+                Medication returned to pharmacy
+              </MenuItem>
+              <MenuItem value="Medication wasted">Medication wasted</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
           <Button
             variant="contained"
             onClick={isServing ? handleSubmitServe : handleSubmitStock}

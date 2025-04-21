@@ -99,11 +99,44 @@ const AdminMedicationUpdatesPage: React.FC = () => {
     }
   };
 
+  const getUpdateTypeColor = (updateType: string) => {
+    switch (updateType) {
+      case "New Medication":
+        return "bg-green-100 text-green-800";
+      case "MedStock Increase":
+        return "bg-blue-100 text-blue-800";
+      case "MedStock Decrease":
+        return "bg-yellow-100 text-yellow-800";
+      case "Activated":
+        return "bg-green-100 text-green-800";
+      case "Deactivated":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-purple-100 text-purple-800";
+    }
+  };
+
+  const formatChangeValue = (value: any) => {
+    if (value === null || value === undefined) return "None";
+    if (typeof value === "object") {
+      if (value.amount && value.unit) return `${value.amount} ${value.unit}`;
+      if (value.name) return value.name;
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
   if (isLoading) return <div>Loading updates...</div>;
   if (error) return <div className="text-red-600">Error: {error}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-blue-900">
+          Medication Updates History
+        </h1>
+      </div>
+
       {/* Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <select
@@ -129,7 +162,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
           <option value="">All Users</option>
           {users.map((user) => (
             <option key={user._id} value={user._id}>
-              {user.email}
+              {user?.email || "Unknown User"}
             </option>
           ))}
         </select>
@@ -187,6 +220,9 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                     Changes
                   </th>
                   <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    Notes
+                  </th>
+                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
                     Timestamp
                   </th>
                   <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -202,55 +238,49 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                         {update.medication.medicationName}
                       </div>
                       <div className="sm:hidden text-xs text-gray-500 mt-1">
-                        {update.updatedBy.email}
+                        {update.updatedBy?.email || "Unknown User"}
                       </div>
                       <div className="sm:hidden text-xs text-gray-500">
                         {new Date(update.timestamp).toLocaleString()}
                       </div>
                     </td>
                     <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
-                      {update.updatedBy.email}
+                      {update.updatedBy?.email || "Unknown User"}
                     </td>
                     <td className="px-3 py-4 text-sm">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                          update.updateType === "created"
-                            ? "bg-green-100 text-green-800"
-                            : update.updateType === "updated"
-                            ? "bg-blue-100 text-blue-800"
-                            : update.updateType === "deactivated"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getUpdateTypeColor(
+                          update.updateType
+                        )}`}
                       >
                         {update.updateType}
                       </span>
                     </td>
                     <td className="px-3 py-4">
                       <div className="max-w-xs text-sm">
-                        {Object.entries(update.changes).map(
-                          ([field, { oldValue, newValue }]) => (
-                            <div key={field} className="mb-1">
-                              <span className="font-medium">{field}:</span>{" "}
-                              <span className="text-red-600">
-                                {typeof oldValue === "object"
-                                  ? oldValue?.medicationName ||
-                                    oldValue?.name ||
-                                    "(none)"
-                                  : String(oldValue)}
-                              </span>
-                              {" → "}
-                              <span className="text-green-600">
-                                {typeof newValue === "object"
-                                  ? newValue?.medicationName ||
-                                    newValue?.name ||
-                                    "(none)"
-                                  : String(newValue)}
-                              </span>
-                            </div>
-                          )
-                        )}
+                        {update.changes &&
+                          Object.entries(update.changes).map(
+                            ([field, change]) => (
+                              <div key={field} className="mb-1">
+                                <span className="font-medium capitalize">
+                                  {field.replace(/([A-Z])/g, " $1").trim()}:
+                                </span>{" "}
+                                <span className="text-red-600">
+                                  {formatChangeValue(change.oldValue)}
+                                </span>
+                                {" → "}
+                                <span className="text-green-600">
+                                  {formatChangeValue(change.newValue)}
+                                </span>
+                              </div>
+                            )
+                          )}
                       </div>
+                    </td>
+                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                      {update.updateType.includes("MedStock")
+                        ? update.notes
+                        : "N/A"}
                     </td>
                     <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
                       {new Date(update.timestamp).toLocaleString()}

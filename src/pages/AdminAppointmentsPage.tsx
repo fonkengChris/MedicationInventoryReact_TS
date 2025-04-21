@@ -5,6 +5,24 @@ import { Appointment } from "../types/models";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+const getStatusColor = (status: string, dateTime: string) => {
+  const appointmentDate = new Date(dateTime);
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // Check if appointment is tomorrow (same day ignoring time)
+  const isTomorrow = appointmentDate.toDateString() === tomorrow.toDateString();
+
+  if (status === "Completed") {
+    return "bg-green-50";
+  } else if (status === "Cancelled" || status === "NoShow") {
+    return "bg-red-50";
+  } else if (isTomorrow) {
+    return "bg-cyan-50";
+  }
+  return ""; // default with no background
+};
+
 const AdminAppointmentsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -75,7 +93,13 @@ const AdminAppointmentsPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {appointments.map((appointment) => (
-                  <tr key={appointment._id}>
+                  <tr
+                    key={appointment._id}
+                    className={getStatusColor(
+                      appointment.status,
+                      appointment.dateTime
+                    )}
+                  >
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <div className="font-medium text-gray-900">
                         {(appointment.serviceUser as any).name}
@@ -92,13 +116,10 @@ const AdminAppointmentsPage: React.FC = () => {
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                       <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          appointment.status === "Completed"
-                            ? "bg-green-100 text-green-800"
-                            : appointment.status === "Cancelled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
+                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${getStatusColor(
+                          appointment.status,
+                          appointment.dateTime
+                        )}`}
                       >
                         {appointment.status}
                       </span>

@@ -11,9 +11,21 @@ const AdminMedicationForm: React.FC = () => {
   const [medication, setMedication] = useState<Partial<Medication>>({
     name: "",
     dosage: "",
+    form: "tablet",
+    route: "oral",
     manufacturer: "",
     notes: "",
   });
+
+  const formOptions = [
+    "tablet",
+    "capsule",
+    "injection",
+    "cream",
+    "solution",
+    "other",
+  ];
+  const routeOptions = ["oral", "intravenous", "topical", "other"];
 
   useEffect(() => {
     if (id) {
@@ -25,12 +37,7 @@ const AdminMedicationForm: React.FC = () => {
             throw new Error("No medication data received");
           }
 
-          setMedication({
-            name: response.data.name,
-            dosage: response.data.dosage,
-            manufacturer: response.data.manufacturer || "",
-            notes: response.data.notes || "",
-          });
+          setMedication(response.data);
         } catch (error) {
           console.error("Error details:", error);
 
@@ -49,28 +56,26 @@ const AdminMedicationForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      // Validate required fields
-      if (!medication.name || !medication.dosage) {
-        throw new Error("Please fill in all required fields");
+      if (
+        !medication.name ||
+        !medication.dosage ||
+        !medication.form ||
+        !medication.route
+      ) {
+        throw new Error("Required fields missing");
       }
 
       if (id) {
-        // Update existing medication
-        await medicationApi.update(id, {
-          name: medication.name,
-          dosage: medication.dosage,
-          manufacturer: medication.manufacturer,
-          notes: medication.notes,
-        });
+        await medicationApi.update(id, medication);
       } else {
-        // Create new medication
         await medicationApi.create({
           name: medication.name,
           dosage: medication.dosage,
-          manufacturer: medication.manufacturer || "",
-          notes: medication.notes || "",
+          form: medication.form,
+          route: medication.route,
+          manufacturer: medication.manufacturer,
+          notes: medication.notes,
         });
       }
       navigate("/admin/medications");
@@ -109,7 +114,9 @@ const AdminMedicationForm: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setMedication((prev) => ({
@@ -152,6 +159,44 @@ const AdminMedicationForm: React.FC = () => {
               required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Form
+            </label>
+            <select
+              name="form"
+              value={medication.form}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+            >
+              {formOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Route
+            </label>
+            <select
+              name="route"
+              value={medication.route}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+            >
+              {routeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

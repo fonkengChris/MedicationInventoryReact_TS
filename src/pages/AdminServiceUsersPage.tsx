@@ -64,6 +64,9 @@ const AdminServiceUsersPage: React.FC = () => {
                   <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
                     Phone
                   </th>
+                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                    Group
+                  </th>
                   <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span className="sr-only">Actions</span>
                   </th>
@@ -90,6 +93,11 @@ const AdminServiceUsersPage: React.FC = () => {
                     </td>
                     <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
                       {user.phoneNumber}
+                    </td>
+                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                      {typeof user.group === "string"
+                        ? user.group
+                        : user.group!.name}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <div className="flex justify-end gap-2">

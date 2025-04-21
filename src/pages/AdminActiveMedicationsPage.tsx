@@ -80,6 +80,12 @@ const AdminActiveMedicationsPage: React.FC = () => {
                   </th>
                   <th
                     scope="col"
+                    className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+                  >
+                    Days Remaining
+                  </th>
+                  <th
+                    scope="col"
                     className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
                   >
                     Status
@@ -96,9 +102,9 @@ const AdminActiveMedicationsPage: React.FC = () => {
                     className={`
                       ${
                         medication.daysRemaining < 5
-                          ? "bg-red-50"
+                          ? "bg-red-200"
                           : medication.daysRemaining < 10
-                          ? "bg-yellow-50"
+                          ? "bg-yellow-200"
                           : ""
                       }
                     `}
@@ -118,6 +124,9 @@ const AdminActiveMedicationsPage: React.FC = () => {
                     </td>
                     <td className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {medication.quantityInStock}
+                    </td>
+                    <td className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {medication.daysRemaining}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                       <span

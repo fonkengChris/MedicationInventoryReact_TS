@@ -13,6 +13,8 @@ export interface Medication {
   _id?: string;
   name: string;
   dosage: string;
+  form: "tablet" | "capsule" | "injection" | "cream" | "solution" | "other";
+  route: "oral" | "intravenous" | "topical" | "other";
   manufacturer?: string;
   notes?: string;
   createdAt?: Date;
@@ -53,7 +55,9 @@ export interface ActiveMedication {
   startDate: string;
   endDate?: string;
   prescribedBy: string;
+  instructions?: string;
   notes?: string;
+  stockChangeNote?: string;
   isActive: boolean;
   lastUpdated: Date;
   updatedBy: string;
@@ -65,19 +69,38 @@ export interface MedicationUpdate {
   medication: {
     _id: string;
     medicationName: string;
+    quantityInStock: number;
+    quantityPerDose: number;
+    dosesPerDay: number;
+    daysRemaining: number;
   };
   updatedBy: {
     _id: string;
     username: string;
     email: string;
   };
-  updateType: "created" | "updated" | "deactivated" | "deleted";
+  updateType:
+    | "New Medication"
+    | "MedStock Increase"
+    | "MedStock Decrease"
+    | "Name Change"
+    | "Service User Change"
+    | "Quantity Per Dose Change"
+    | "Doses Per Day Change"
+    | "Prescriber Change"
+    | "Dosage Change"
+    | "Frequency Change"
+    | "Notes Change"
+    | "Activated"
+    | "Deactivated";
   changes: {
     [key: string]: {
       oldValue: any;
       newValue: any;
     };
   };
+  notes?: string;
+  stockChangeNote?: string;
   timestamp: string;
 }
 
@@ -115,3 +138,37 @@ export interface Group {
   createdBy: string;
   updatedBy?: string;
 }
+
+// export type CareHome = {
+//   _id: string;
+//   name: string;
+//   location: string;
+//   manager: string;
+// };
+
+// export type Employee = {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   phone: string;
+//   role: string;
+//   care_home_id: string;
+//   availability: string[];
+// };
+
+// export type Shift = {
+//   _id: string;
+//   care_home_id: string;
+//   employee_id: string;
+//   employee_name: string;
+//   date: string;
+//   start_time: string;
+//   end_time: string;
+// };
+
+// export type Rota = {
+//   _id: string;
+//   care_home_id: string;
+//   week_start: string;
+//   shifts: Shift[];
+// };

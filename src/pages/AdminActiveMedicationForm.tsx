@@ -153,6 +153,33 @@ const AdminActiveMedicationForm: React.FC = () => {
     }
   };
 
+  const handleActivationToggle = async (newActiveState: boolean) => {
+    if (!id) return;
+
+    try {
+      setIsLoading(true);
+      if (newActiveState) {
+        // Reactivate medication through PUT request
+        await activeMedicationApi.update(id, {
+          isActive: true,
+        });
+      } else {
+        // Deactivate medication through PATCH request
+        await activeMedicationApi.deactivate(id);
+      }
+      navigate("/admin/active-medications");
+    } catch (error) {
+      console.error("Error toggling medication activation:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while updating activation status"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <h1 className="text-xl sm:text-2xl font-bold text-blue-900 mb-4 sm:mb-6">
@@ -361,37 +388,52 @@ const AdminActiveMedicationForm: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="isActive"
-              checked={activeMedication.isActive}
-              onChange={(e) =>
-                setActiveMedication((prev) => ({
-                  ...prev,
-                  isActive: e.target.checked,
-                }))
-              }
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label className="ml-2 block text-sm text-gray-900">
-              Medication is Active
-            </label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-sm font-medium text-gray-700 mr-2">
+                Status:
+              </span>
+              <span
+                className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                  activeMedication.isActive
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {activeMedication.isActive ? "Active" : "Inactive"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleActivationToggle(!activeMedication.isActive)}
+              className={`px-4 py-2 rounded-md text-white ${
+                activeMedication.isActive
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+              disabled={isLoading}
+            >
+              {isLoading
+                ? "Updating..."
+                : activeMedication.isActive
+                ? "Deactivate Medication"
+                : "Activate Medication"}
+            </button>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
+        <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-6 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={() => navigate("/admin/active-medications")}
-            className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
+            className="w-full sm:w-auto px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+            className="w-full sm:w-auto px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
           >
             {isLoading
               ? "Saving..."

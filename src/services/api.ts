@@ -72,6 +72,16 @@ export const activeMedicationApi = {
   delete: (id: string) => api.delete(`/active-medications/${id}`),
   patch: (id: string, activeMedication: Partial<ActiveMedication>) =>
     api.patch<ActiveMedication>(`/active-medications/${id}`, activeMedication),
+  deactivate: (id: string) =>
+    api.put(
+      `/active-medications/${id}/deactivate`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ),
 };
 
 export const medicationUpdateApi = {
@@ -81,10 +91,10 @@ export const medicationUpdateApi = {
   getByUser: (userId: string) =>
     api.get<MedicationUpdate[]>(`/updates/user/${userId}`),
   getByDateRange: (filter: DateRangeFilter) =>
-    api.get<MedicationUpdate[]>("/updates/date-range", {
-      params: filter,
-    }),
+    api.get<MedicationUpdate[]>("/updates/date-range", { params: filter }),
   delete: (id: string) => api.delete(`/updates/${id}`),
+  create: (update: Omit<MedicationUpdate, "_id">) =>
+    api.post<MedicationUpdate>("/updates", update),
 };
 
 export const userApi = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { groupApi } from "../services/api";
-import { Group } from "../types/models";
+import { Group, User } from "../types/models";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -84,7 +84,10 @@ const AdminGroupsPage: React.FC = () => {
                       {group.description}
                     </td>
                     <td className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {group.createdBy}
+                      {typeof group.createdBy === "object" &&
+                      group.createdBy !== null
+                        ? (group.createdBy as User).username
+                        : group.createdBy}
                     </td>
                     <td className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {new Date(group.createdAt!).toLocaleDateString()}

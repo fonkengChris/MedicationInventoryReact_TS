@@ -8,11 +8,14 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
 import BusinessIcon from "@mui/icons-material/Business";
 import DescriptionIcon from "@mui/icons-material/Description";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import MedicationIcon from "@mui/icons-material/Medication";
 import useMedication from "../hooks/useMedication";
 
 const MedicationDetails: React.FC = () => {
@@ -46,6 +49,25 @@ const MedicationDetails: React.FC = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <MedicalInformationIcon />
               <Typography>Dosage: {medication.dosage}</Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <MedicationIcon />
+                <Chip
+                  label={`Form: ${medication.form}`}
+                  color="primary"
+                  variant="outlined"
+                />
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <LocalHospitalIcon />
+                <Chip
+                  label={`Route: ${medication.route}`}
+                  color="secondary"
+                  variant="outlined"
+                />
+              </Box>
             </Box>
 
             {medication.manufacturer && (
