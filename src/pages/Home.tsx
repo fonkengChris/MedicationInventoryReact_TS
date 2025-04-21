@@ -323,11 +323,12 @@ const Home = () => {
               "& .MuiTable-root": {
                 minWidth: { xs: 650, sm: 800 },
               },
+              border: "2px solid cyan",
             }}
           >
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{ borderBottom: "2px solid #81D4FA" }}>
                   <TableCell>Medication Name</TableCell>
                   <TableCell>Dosage</TableCell>
                   <TableCell>Stock Level</TableCell>
@@ -340,7 +341,14 @@ const Home = () => {
               </TableHead>
               <TableBody>
                 {filteredMedications.map((medication) => (
-                  <TableRow key={medication._id}>
+                  <TableRow
+                    key={medication._id}
+                    sx={{
+                      "&:not(:last-child)": {
+                        borderBottom: "2px solid #81D4FA", // Light blue border
+                      },
+                    }}
+                  >
                     <TableCell>{medication.medicationName}</TableCell>
                     <TableCell>{`${medication.dosage.amount} ${medication.dosage.unit}`}</TableCell>
                     <TableCell>{medication.quantityInStock}</TableCell>
@@ -387,11 +395,12 @@ const Home = () => {
                 "& .MuiTable-root": {
                   minWidth: { xs: 650, sm: 800 },
                 },
+                border: "2px solid cyan",
               }}
             >
               <Table>
                 <TableHead>
-                  <TableRow>
+                  <TableRow sx={{ borderBottom: "2px solid #80DEEA" }}>
                     <TableCell>Type</TableCell>
                     <TableCell>Date & Time</TableCell>
                     <TableCell>Duration</TableCell>
@@ -405,7 +414,14 @@ const Home = () => {
                   {filteredAppointments
                     .filter((appointment) => appointment.status === "Scheduled")
                     .map((appointment) => (
-                      <TableRow key={appointment._id}>
+                      <TableRow
+                        key={appointment._id}
+                        sx={{
+                          "&:not(:last-child)": {
+                            borderBottom: "2px solid #80DEEA", // Light cyan border
+                          },
+                        }}
+                      >
                         <TableCell>{appointment.appointmentType}</TableCell>
                         <TableCell>
                           {new Date(appointment.dateTime).toLocaleString()}
