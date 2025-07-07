@@ -8,11 +8,12 @@ import {
   DateRangeFilter,
   Appointment,
   Group,
+  WeeklySummary,
 } from "../types/models";
 
 const API_BASE_URL = "http://localhost:5000/api"; // Make sure this matches your backend URL
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
@@ -100,6 +101,7 @@ export const medicationUpdateApi = {
 export const userApi = {
   getAll: () => api.get<User[]>("/users"),
   getById: (id: string) => api.get<User>(`/users/${id}`),
+  getCurrentUser: () => api.get<User>("/auth/me"),
   update: (id: string, user: Partial<User>) =>
     api.put<User>(`/users/${id}`, user),
   delete: (id: string) => api.delete(`/users/${id}`),
@@ -125,4 +127,42 @@ export const groupApi = {
   update: (id: string, group: Partial<Group>) =>
     api.put<Group>(`/groups/${id}`, group),
   delete: (id: string) => api.delete(`/groups/${id}`),
+};
+
+export const weeklySummariesApi = {
+  getAll: async (params?: { startDate?: string; endDate?: string }) => {
+    console.log("Fetching weekly summaries with params:", params);
+    const response = await api.get<WeeklySummary>("/summaries/date-range", {
+      params,
+    });
+    console.log("Weekly summaries response:", response.data);
+    return response;
+  },
+  generate: async (params: { startDate: string; endDate: string }) => {
+    console.log("Generating weekly summary");
+    const response = await api.post<WeeklySummary>(
+      "/summaries/generate",
+      params
+    );
+    console.log("Generate summary response:", response.data);
+    return response;
+  },
+  downloadPdf: (summaryId: string) =>
+    api.get(`/summaries/${summaryId}/pdf`, { responseType: "blob" }),
+  getByMedication: (
+    medicationId: string,
+    params: { startDate: string; endDate: string }
+  ) =>
+    api.get<WeeklySummary["summaries"][0]>(
+      `/summaries/medication/${medicationId}`,
+      { params }
+    ),
+  getByServiceUser: (
+    serviceUserId: string,
+    params: { startDate: string; endDate: string }
+  ) =>
+    api.get<WeeklySummary["summaries"]>(
+      `/summaries/service-user/${serviceUserId}`,
+      { params }
+    ),
 };

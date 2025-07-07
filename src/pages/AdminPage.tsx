@@ -11,6 +11,8 @@ import {
   FiMenu,
   FiX,
   FiClock,
+  FiBarChart2,
+  FiTrendingUp,
 } from "react-icons/fi";
 import { jwtDecode } from "jwt-decode";
 
@@ -125,6 +127,22 @@ const AdminPage: React.FC = () => {
                 <FiActivity className="mr-2" />
                 Medication Updates
               </Link>
+              <Link
+                to="/admin/weekly-summaries"
+                className="flex items-center text-white hover:text-blue-200 py-2"
+                onClick={closeSidebar}
+              >
+                <FiBarChart2 className="mr-2" />
+                Weekly Summaries
+              </Link>
+              {/* <Link
+                to="/admin/medication-trends"
+                className="flex items-center text-white hover:text-blue-200 py-2"
+                onClick={closeSidebar}
+              >
+                <FiTrendingUp className="mr-2" />
+                Medication Trends
+              </Link> */}
               {/* <Link
                 to="/admin/rota"
                 className="flex items-center text-white hover:text-blue-200 py-2"

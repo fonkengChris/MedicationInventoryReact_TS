@@ -162,7 +162,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
           <option value="">All Users</option>
           {users.map((user) => (
             <option key={user._id} value={user._id}>
-              {user?.email || "Unknown User"}
+              {user?.username || user?.email || "Unknown User"}
             </option>
           ))}
         </select>
@@ -238,14 +238,18 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                         {update.medication.medicationName}
                       </div>
                       <div className="sm:hidden text-xs text-gray-500 mt-1">
-                        {update.updatedBy?.email || "Unknown User"}
+                        {update.updatedBy?.username ||
+                          update.updatedBy?.email ||
+                          "Unknown User"}
                       </div>
                       <div className="sm:hidden text-xs text-gray-500">
                         {new Date(update.timestamp).toLocaleString()}
                       </div>
                     </td>
                     <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
-                      {update.updatedBy?.email || "Unknown User"}
+                      {update.updatedBy?.username ||
+                        update.updatedBy?.email ||
+                        "Unknown User"}
                     </td>
                     <td className="px-3 py-4 text-sm">
                       <span

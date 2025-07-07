@@ -26,6 +26,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { onMessage } from "firebase/messaging";
 import AppointmentList from "./pages/AppointmentList";
 import MedicationDetails from "./pages/MedicationDetails";
+import AdminWeeklySummariesPage from "./pages/AdminWeeklySummariesPage";
+// import { MedicationTrends } from "./pages/AdminMedicationTrends";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -147,6 +149,11 @@ function App() {
             <Route path="groups" element={<AdminGroupsPage />} />
             <Route path="groups/new" element={<AdminGroupForm />} />
             <Route path="groups/edit/:id" element={<AdminGroupForm />} />
+            <Route
+              path="weekly-summaries"
+              element={<AdminWeeklySummariesPage />}
+            />
+            {/* <Route path="medication-trends" element={<MedicationTrends />} /> */}
           </Route>
         </Routes>
       </Router>

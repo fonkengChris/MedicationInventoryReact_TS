@@ -35,6 +35,7 @@ import {
   Grid,
   Avatar,
   Stack,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
@@ -43,6 +44,8 @@ import { jwtDecode } from "jwt-decode";
 import useServiceUsers from "../hooks/useServiceUsers";
 import useActiveMedications from "../hooks/useActiveMedications";
 import useAppointments from "../hooks/useAppointments";
+import useCurrentUser from "../hooks/useCurrentUser";
+import { SelectChangeEvent } from "@mui/material";
 
 const Home = () => {
   const [selectedUser, setSelectedUser] = useState<string>("");
@@ -74,17 +77,73 @@ const Home = () => {
     useActiveMedications();
   const { data: appointments = [], refetch: fetchAppointments } =
     useAppointments();
+  const { data: currentUser, isLoading: isLoadingCurrentUser } =
+    useCurrentUser();
 
   // Filter service users based on user's role and group
   const filteredServiceUsers = React.useMemo(() => {
     const token = localStorage.getItem("token");
     if (!token) return [];
 
-    const decodedToken = jwtDecode<User>(token);
-    if (decodedToken.role === "admin") return serviceUsers;
+    // First, check if user is admin/superAdmin from token (immediate check)
+    let isAdmin = false;
+    try {
+      const decodedToken = jwtDecode<{ role: string }>(token);
+      isAdmin = ["admin", "superAdmin"].includes(decodedToken.role);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
 
-    return serviceUsers;
-  }, [serviceUsers]);
+    // If user is admin or superAdmin, show all service users
+    if (isAdmin) {
+      return serviceUsers;
+    }
+
+    // For regular users, only show service users from their groups
+    if (currentUser && currentUser.groups && serviceUsers.length > 0) {
+      // Extract user group IDs - handle both string and object formats
+      const userGroupIds: string[] = [];
+
+      if (Array.isArray(currentUser.groups)) {
+        currentUser.groups.forEach((group) => {
+          if (typeof group === "string") {
+            userGroupIds.push(group);
+          } else if (group && typeof group === "object" && "_id" in group) {
+            userGroupIds.push(group._id);
+          }
+        });
+      }
+
+      const filtered = serviceUsers.filter((serviceUser) => {
+        // Extract service user group ID
+        let serviceUserGroupId: string | null = null;
+        if (typeof serviceUser.group === "string") {
+          serviceUserGroupId = serviceUser.group;
+        } else if (
+          serviceUser.group &&
+          typeof serviceUser.group === "object" &&
+          "_id" in serviceUser.group
+        ) {
+          serviceUserGroupId = serviceUser.group._id;
+        }
+
+        if (!serviceUserGroupId) {
+          return false;
+        }
+
+        // Check if the service user's group ID matches any of the user's group IDs
+        const isInGroup = userGroupIds.some((userGroupId) => {
+          return userGroupId === serviceUserGroupId;
+        });
+
+        return isInGroup;
+      });
+
+      return filtered;
+    }
+
+    return [];
+  }, [serviceUsers, currentUser]);
 
   const filteredMedications = activeMedications.filter(
     (med) => (med.serviceUser as any)._id === selectedUser && med.isActive
@@ -101,6 +160,8 @@ const Home = () => {
   const handleAddStock = (medication: ActiveMedication) => {
     setSelectedMedication(medication);
     setIsServing(false);
+    setNotes("");
+    setQuantity(0);
     setIsModalOpen(true);
   };
 
@@ -111,6 +172,7 @@ const Home = () => {
       await activeMedicationApi.update(selectedMedication._id, {
         quantityInStock: selectedMedication.quantityInStock + quantity,
         stockChangeNote: notes,
+        notes: notes,
       });
       await fetchActiveMedications();
       setIsModalOpen(false);
@@ -124,6 +186,7 @@ const Home = () => {
   const handleServeMedication = (medication: ActiveMedication) => {
     setSelectedMedication(medication);
     setIsServing(true);
+    setNotes("");
     setQuantity(medication.quantityPerDose);
     setIsModalOpen(true);
   };
@@ -135,6 +198,7 @@ const Home = () => {
       await activeMedicationApi.update(selectedMedication._id, {
         quantityInStock: selectedMedication.quantityInStock - quantity,
         stockChangeNote: notes,
+        notes: notes,
       });
       await fetchActiveMedications();
       setIsModalOpen(false);
@@ -177,6 +241,26 @@ const Home = () => {
     }
   };
 
+  const handleNotesChange = (event: SelectChangeEvent<string>) => {
+    setNotes(event.target.value);
+  };
+
+  const noteOptions = isServing
+    ? [
+        "Medication administered",
+        "Medication leaving the home",
+        "Medication returned to pharmacy",
+        "Medication wasted",
+        "Stock count correction",
+        "Other",
+      ]
+    : [
+        "Stock received from pharmacy",
+        "Medication returned home",
+        "Stock count correction",
+        "Other",
+      ];
+
   return (
     <>
       <Box sx={{ p: 3 }}>
@@ -186,6 +270,40 @@ const Home = () => {
         <Typography variant="subtitle1" gutterBottom>
           Please select a service user to manage their medications
         </Typography>
+        {(() => {
+          const token = localStorage.getItem("token");
+          if (token) {
+            try {
+              const decodedToken = jwtDecode<{ role: string }>(token);
+              if (
+                !["admin", "superAdmin"].includes(decodedToken.role) &&
+                currentUser?.groups
+              ) {
+                return (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      You have access to service users in your assigned groups:{" "}
+                      {Array.isArray(currentUser.groups)
+                        ? currentUser.groups
+                            .map((group) =>
+                              typeof group === "string" ? group : group.name
+                            )
+                            .join(", ")
+                        : "No groups assigned"}
+                    </Typography>
+                  </Box>
+                );
+              }
+            } catch (error) {
+              console.error("Error decoding token:", error);
+            }
+          }
+          return null;
+        })()}
 
         <FormControl fullWidth sx={{ mt: 2 }}>
           <InputLabel id="service-user-label">
@@ -202,7 +320,11 @@ const Home = () => {
                 : "Please log in to view service users"
             }
             onChange={handleUserChange}
-            disabled={!localStorage.getItem("token") || isLoadingUsers}
+            disabled={
+              !localStorage.getItem("token") ||
+              isLoadingUsers ||
+              isLoadingCurrentUser
+            }
           >
             {localStorage.getItem("token") ? (
               filteredServiceUsers.map((user) => (
@@ -215,6 +337,29 @@ const Home = () => {
             )}
           </Select>
         </FormControl>
+
+        {/* Show message if user has no access to service users */}
+        {localStorage.getItem("token") &&
+          !isLoadingUsers &&
+          !isLoadingCurrentUser &&
+          filteredServiceUsers.length === 0 && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              {(() => {
+                const token = localStorage.getItem("token");
+                if (token) {
+                  try {
+                    const decodedToken = jwtDecode<{ role: string }>(token);
+                    if (["admin", "superAdmin"].includes(decodedToken.role)) {
+                      return "No service users found in the system.";
+                    }
+                  } catch (error) {
+                    console.error("Error decoding token:", error);
+                  }
+                }
+                return "You don't have access to any service users. Please contact your administrator to be assigned to a group.";
+              })()}
+            </Alert>
+          )}
 
         {/* Add profile card */}
         {selectedUser && (
@@ -457,7 +602,14 @@ const Home = () => {
           </Button>
         )}
       </Box>
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setNotes("");
+          setQuantity(0);
+        }}
+      >
         <Box
           sx={{
             position: "absolute",
@@ -479,36 +631,18 @@ const Home = () => {
             type="number"
             label={isServing ? "Quantity to Serve" : "Quantity to Add"}
             value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
+            onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
+            inputProps={{ min: 0 }}
             sx={{ my: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Notes</InputLabel>
-            <Select
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              label="Notes"
-            >
-              <MenuItem value="Stock received from pharmacy">
-                Stock received from pharmacy
-              </MenuItem>
-              <MenuItem value="Stock count correction">
-                Stock count correction
-              </MenuItem>
-              <MenuItem value="Medication administered">
-                Medication administered
-              </MenuItem>
-              <MenuItem value="Medication leaving the home">
-                Medication leaving the home
-              </MenuItem>
-              <MenuItem value="Medication returned home">
-                Medication returned home
-              </MenuItem>
-              <MenuItem value="Medication returned to pharmacy">
-                Medication returned to pharmacy
-              </MenuItem>
-              <MenuItem value="Medication wasted">Medication wasted</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
+            <Select value={notes} onChange={handleNotesChange} label="Notes">
+              {noteOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <Button
