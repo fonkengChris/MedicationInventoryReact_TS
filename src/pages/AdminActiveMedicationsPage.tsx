@@ -4,6 +4,19 @@ import { activeMedicationApi } from "../services/api";
 import { ActiveMedication } from "../types/models";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableFooter,
+  TablePagination,
+  Button,
+  Typography,
+} from "@mui/material";
 
 const AdminActiveMedicationsPage: React.FC = () => {
   const [activeMedications, setActiveMedications] = useState<
@@ -37,69 +50,70 @@ const AdminActiveMedicationsPage: React.FC = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-blue-900">
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
           Active Medications Management
-        </h1>
-        <Link
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
           to="/admin/active-medications/new"
-          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Add Active Medication
-        </Link>
+        </Button>
       </div>
 
-      <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle">
-          <div className="shadow-sm ring-1 ring-black ring-opacity-5">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6"
-                  >
-                    Service User
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
-                  >
-                    Medication Name
-                  </th>
-                  <th
-                    scope="col"
-                    className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
-                  >
-                    Dosage
-                  </th>
-                  <th
-                    scope="col"
-                    className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
-                  >
-                    Stock
-                  </th>
-                  <th
-                    scope="col"
-                    className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
-                  >
-                    Days Remaining
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
-                  >
-                    Status
-                  </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {activeMedications.map((medication) => (
-                  <tr
-                    key={medication._id}
-                    className={`
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
+        <Table className="min-w-full divide-y divide-gray-300">
+          <TableHead className="bg-gray-50">
+            <TableRow>
+              <TableCell
+                scope="col"
+                className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6"
+              >
+                Service User
+              </TableCell>
+              <TableCell
+                scope="col"
+                className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+              >
+                Medication Name
+              </TableCell>
+              <TableCell
+                scope="col"
+                className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+              >
+                Dosage
+              </TableCell>
+              <TableCell
+                scope="col"
+                className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+              >
+                Stock
+              </TableCell>
+              <TableCell
+                scope="col"
+                className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+              >
+                Days Remaining
+              </TableCell>
+              <TableCell
+                scope="col"
+                className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900"
+              >
+                Status
+              </TableCell>
+              <TableCell scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span className="sr-only">Actions</span>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody className="divide-y divide-gray-200 bg-white">
+            {activeMedications.map((medication) => (
+              <TableRow
+                key={medication._id}
+                className={`
                       ${
                         medication.daysRemaining < 5
                           ? "bg-red-200"
@@ -108,65 +122,65 @@ const AdminActiveMedicationsPage: React.FC = () => {
                           : ""
                       }
                     `}
+              >
+                <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                  <div className="font-medium text-gray-900">
+                    {typeof medication.serviceUser === "object"
+                      ? medication.serviceUser.name
+                      : "Loading..."}
+                  </div>
+                </TableCell>
+                <TableCell className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {medication.medicationName}
+                </TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {`${medication.dosage.amount} ${medication.dosage.unit}`}
+                </TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {medication.quantityInStock}
+                </TableCell>
+                <TableCell className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {medication.daysRemaining}
+                </TableCell>
+                <TableCell className="whitespace-nowrap px-3 py-4 text-sm">
+                  <span
+                    className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                      medication.isActive
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                   >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                      <div className="font-medium text-gray-900">
-                        {typeof medication.serviceUser === "object"
-                          ? medication.serviceUser.name
-                          : "Loading..."}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {medication.medicationName}
-                    </td>
-                    <td className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {`${medication.dosage.amount} ${medication.dosage.unit}`}
-                    </td>
-                    <td className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {medication.quantityInStock}
-                    </td>
-                    <td className="hidden sm:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {medication.daysRemaining}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span
-                        className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                          medication.isActive
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {medication.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Link
-                          to={`/admin/active-medications/edit/${medication._id}`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <EditIcon className="h-5 w-5" />
-                          <span className="sr-only">Edit</span>
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setSelectedMedicationId(medication._id);
-                            setIsDeleteModalOpen(true);
-                          }}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <DeleteIcon className="h-5 w-5" />
-                          <span className="sr-only">Delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+                    {medication.isActive ? "Active" : "Inactive"}
+                  </span>
+                </TableCell>
+                <TableCell className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                  <div className="flex justify-end gap-2">
+                    <Link
+                      to={`/admin/active-medications/edit/${medication._id}`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      <EditIcon className="h-5 w-5" />
+                      <span className="sr-only">Edit</span>
+                    </Link>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => {
+                        setSelectedMedicationId(medication._id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <DeleteIcon className="h-5 w-5" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
@@ -187,20 +201,21 @@ const AdminActiveMedicationsPage: React.FC = () => {
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="contained"
+                  color="error"
                   onClick={() => handleDelete(selectedMedicationId)}
                   className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
                 >
                   Delete
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outlined"
                   onClick={() => setIsDeleteModalOpen(false)}
                   className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>

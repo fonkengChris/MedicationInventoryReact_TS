@@ -139,6 +139,7 @@ const AdminWeeklySummariesPage = () => {
           variant="contained"
           onClick={handleGenerate}
           disabled={generateMutation.isPending || !startDate || !endDate}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           {generateMutation.isPending ? (
             <CircularProgress size={24} />

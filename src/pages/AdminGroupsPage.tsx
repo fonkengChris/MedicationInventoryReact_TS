@@ -4,6 +4,17 @@ import { groupApi } from "../services/api";
 import { Group, User } from "../types/models";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Button,
+} from "@mui/material";
 
 const AdminGroupsPage: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -35,91 +46,92 @@ const AdminGroupsPage: React.FC = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-blue-900">
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
           Groups Management
-        </h1>
-        <Link
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
           to="/admin/groups/new"
-          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Add Group
-        </Link>
+        </Button>
       </div>
 
-      <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle">
-          <div className="shadow-sm ring-1 ring-black ring-opacity-5">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6">
-                    Name
-                  </th>
-                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Description
-                  </th>
-                  <th className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Created By
-                  </th>
-                  <th className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Created At
-                  </th>
-                  <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {groups.map((group) => (
-                  <tr key={group._id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                      <div className="font-medium text-gray-900">
-                        {group.name}
-                      </div>
-                      <div className="sm:hidden text-gray-500 mt-1">
-                        {group.description}
-                      </div>
-                    </td>
-                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
-                      {group.description}
-                    </td>
-                    <td className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {typeof group.createdBy === "object" &&
-                      group.createdBy !== null
-                        ? (group.createdBy as User).username
-                        : group.createdBy}
-                    </td>
-                    <td className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {new Date(group.createdAt!).toLocaleDateString()}
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Link
-                          to={`/admin/groups/edit/${group._id}`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          <EditIcon className="h-5 w-5" />
-                          <span className="sr-only">Edit</span>
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setSelectedGroupId(group._id);
-                            setIsDeleteModalOpen(true);
-                          }}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <DeleteIcon className="h-5 w-5" />
-                          <span className="sr-only">Delete</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
+        <Table className="min-w-full divide-y divide-gray-300">
+          <TableHead className="bg-gray-50">
+            <TableRow>
+              <TableCell className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6">
+                Name
+              </TableCell>
+              <TableCell className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                Description
+              </TableCell>
+              <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                Created By
+              </TableCell>
+              <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                Created At
+              </TableCell>
+              <TableCell className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span className="sr-only">Actions</span>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody className="divide-y divide-gray-200 bg-white">
+            {groups.map((group) => (
+              <TableRow key={group._id}>
+                <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                  <div className="font-medium text-gray-900">
+                    {group.name}
+                  </div>
+                  <div className="sm:hidden text-gray-500 mt-1">
+                    {group.description}
+                  </div>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                  {group.description}
+                </TableCell>
+                <TableCell className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {typeof group.createdBy === "object" &&
+                  group.createdBy !== null
+                    ? (group.createdBy as User).username
+                    : group.createdBy}
+                </TableCell>
+                <TableCell className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {new Date(group.createdAt!).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                  <div className="flex justify-end gap-2">
+                    <Link
+                      to={`/admin/groups/edit/${group._id}`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      <EditIcon className="h-5 w-5" />
+                      <span className="sr-only">Edit</span>
+                    </Link>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => {
+                        setSelectedGroupId(group._id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                      sx={{ width: { xs: '100%', sm: 'auto' } }}
+                    >
+                      <DeleteIcon className="h-5 w-5" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
@@ -140,20 +152,21 @@ const AdminGroupsPage: React.FC = () => {
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="contained"
+                  color="error"
                   onClick={() => handleDelete(selectedGroupId)}
-                  className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Delete
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outlined"
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
   Paper,
   Alert,
   Link,
+  Grid,
 } from "@mui/material";
 
 const Auth = () => {
@@ -74,39 +75,45 @@ const Auth = () => {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              margin="normal"
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              margin="normal"
-              sx={{ mb: 3 }}
-            />
-
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ mt: 2 }}
-            >
-              Login
-            </Button>
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  sx={{ mb: 3 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  sx={{ mt: 2 }}
+                >
+                  Login
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
 
           <Box sx={{ mt: 3, textAlign: "center" }}>

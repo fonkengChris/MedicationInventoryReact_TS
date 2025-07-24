@@ -7,6 +7,7 @@ import {
 } from "../services/api";
 import { ActiveMedication, ServiceUser, Medication } from "../types/models";
 import { jwtDecode } from "jwt-decode";
+import { Grid, Button, Typography } from "@mui/material";
 
 const DOSAGE_UNITS = [
   "mg",
@@ -181,59 +182,61 @@ const AdminActiveMedicationForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-blue-900 mb-4 sm:mb-6">
-        {id ? "Edit Active Medication" : "Add Active Medication"}
-      </h1>
+    <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid item xs={12}>
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+          {id ? "Edit Active Medication" : "Add Active Medication"}
+        </Typography>
+      </Grid>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Service User
-            </label>
-            <select
-              name="serviceUser"
-              value={
-                typeof activeMedication.serviceUser === "object"
-                  ? activeMedication.serviceUser._id
-                  : activeMedication.serviceUser || ""
-              }
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            >
-              <option value="">Select Service User</option>
-              {serviceUsers.map((user) => (
-                <option key={user._id} value={user._id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-          </div>
+      <Grid item xs={12}>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Service User
+              </label>
+              <select
+                name="serviceUser"
+                value={
+                  typeof activeMedication.serviceUser === "object"
+                    ? activeMedication.serviceUser._id
+                    : activeMedication.serviceUser || ""
+                }
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              >
+                <option value="">Select Service User</option>
+                {serviceUsers.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </Grid>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Medication
-            </label>
-            <select
-              name="medicationName"
-              value={activeMedication.medicationName}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            >
-              <option value="">Select Medication</option>
-              {medications.map((med) => (
-                <option key={med._id} value={med.name}>
-                  {med.name} - {med.dosage}
-                </option>
-              ))}
-            </select>
-          </div>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Medication
+              </label>
+              <select
+                name="medicationName"
+                value={activeMedication.medicationName}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              >
+                <option value="">Select Medication</option>
+                {medications.map((med) => (
+                  <option key={med._id} value={med.name}>
+                    {med.name} - {med.dosage}
+                  </option>
+                ))}
+              </select>
+            </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Dosage Amount
               </label>
@@ -247,8 +250,8 @@ const AdminActiveMedicationForm: React.FC = () => {
                 step="0.1"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Dosage Unit
               </label>
@@ -265,11 +268,9 @@ const AdminActiveMedicationForm: React.FC = () => {
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
+            </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Quantity in Stock
               </label>
@@ -282,8 +283,8 @@ const AdminActiveMedicationForm: React.FC = () => {
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Quantity per Dose
               </label>
@@ -297,11 +298,9 @@ const AdminActiveMedicationForm: React.FC = () => {
                 step="0.1"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-          </div>
+            </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Doses per Day
               </label>
@@ -315,10 +314,10 @@ const AdminActiveMedicationForm: React.FC = () => {
                 step="1"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-          </div>
+            </Grid>
+          </Grid>
 
-          <div>
+          <Grid item xs={12}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Frequency
             </label>
@@ -331,10 +330,10 @@ const AdminActiveMedicationForm: React.FC = () => {
               placeholder="e.g., Once daily, Twice daily, Every 4 hours"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
             />
-          </div>
+          </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Start Date
               </label>
@@ -346,8 +345,8 @@ const AdminActiveMedicationForm: React.FC = () => {
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 End Date
               </label>
@@ -358,10 +357,10 @@ const AdminActiveMedicationForm: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-          </div>
+            </Grid>
+          </Grid>
 
-          <div>
+          <Grid item xs={12}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Prescribed By
             </label>
@@ -373,9 +372,9 @@ const AdminActiveMedicationForm: React.FC = () => {
               required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
             />
-          </div>
+          </Grid>
 
-          <div>
+          <Grid item xs={12}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Notes
             </label>
@@ -386,53 +385,59 @@ const AdminActiveMedicationForm: React.FC = () => {
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
             />
-          </div>
+          </Grid>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-gray-700 mr-2">
-                Status:
-              </span>
-              <span
-                className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+          <Grid item xs={12}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-gray-700 mr-2">
+                  Status:
+                </span>
+                <span
+                  className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                    activeMedication.isActive
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {activeMedication.isActive ? "Active" : "Inactive"}
+                </span>
+              </div>
+              <Button
+                type="button"
+                onClick={() => handleActivationToggle(!activeMedication.isActive)}
+                className={`px-4 py-2 rounded-md text-white ${
                   activeMedication.isActive
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
                 }`}
+                disabled={isLoading}
               >
-                {activeMedication.isActive ? "Active" : "Inactive"}
-              </span>
+                {isLoading
+                  ? "Updating..."
+                  : activeMedication.isActive
+                  ? "Deactivate Medication"
+                  : "Activate Medication"}
+              </Button>
             </div>
-            <button
-              type="button"
-              onClick={() => handleActivationToggle(!activeMedication.isActive)}
-              className={`px-4 py-2 rounded-md text-white ${
-                activeMedication.isActive
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading
-                ? "Updating..."
-                : activeMedication.isActive
-                ? "Deactivate Medication"
-                : "Activate Medication"}
-            </button>
-          </div>
-        </div>
+          </Grid>
+        </form>
+      </Grid>
 
+      <Grid item xs={12}>
         <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-6 pt-4 border-t border-gray-200">
-          <button
+          <Button
             type="button"
             onClick={() => navigate("/admin/active-medications")}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
             className="w-full sm:w-auto px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isLoading}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
             className="w-full sm:w-auto px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
           >
             {isLoading
@@ -440,10 +445,10 @@ const AdminActiveMedicationForm: React.FC = () => {
               : id
               ? "Update Active Medication"
               : "Add Active Medication"}
-          </button>
+          </Button>
         </div>
-      </form>
-    </div>
+      </Grid>
+    </Grid>
   );
 };
 

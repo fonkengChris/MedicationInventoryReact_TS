@@ -10,6 +10,7 @@ import {
   Paper,
   Alert,
   Link,
+  Grid,
 } from "@mui/material";
 
 const Register = () => {
@@ -83,68 +84,80 @@ const Register = () => {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Username"
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              margin="normal"
-              sx={{ mb: 2 }}
-            />
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Username"
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
 
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              margin="normal"
-              sx={{ mb: 2 }}
-            />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
 
-            <TextField
-              fullWidth
-              label="Phone Number"
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-              margin="normal"
-              inputProps={{
-                pattern: "^\\+44[0-9]{10}$",
-              }}
-              placeholder="Enter your phone number (+44)"
-              helperText="Example: +441234567890"
-              sx={{ mb: 2 }}
-            />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Phone Number"
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  inputProps={{
+                    pattern: "^\\+44[0-9]{10}$",
+                  }}
+                  placeholder="Enter your phone number (+44)"
+                  helperText="Example: +441234567890"
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
 
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              margin="normal"
-              sx={{ mb: 3 }}
-            />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  margin="normal"
+                  sx={{ mb: 3 }}
+                />
+              </Grid>
 
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ mt: 2 }}
-            >
-              Register
-            </Button>
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  sx={{ mt: 2 }}
+                >
+                  Register
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
 
           <Box sx={{ mt: 3, textAlign: "center" }}>

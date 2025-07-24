@@ -264,7 +264,7 @@ const Home = () => {
   return (
     <>
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: '2rem', sm: '2.5rem' } }}>
           Welcome to MedTracker
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
@@ -464,9 +464,9 @@ const Home = () => {
             component={Paper}
             sx={{
               mt: 4,
-              overflow: "auto",
+              overflowX: 'auto',
               "& .MuiTable-root": {
-                minWidth: { xs: 650, sm: 800 },
+                minWidth: { xs: 500, sm: 800 },
               },
               border: "2px solid cyan",
             }}
@@ -596,7 +596,7 @@ const Home = () => {
           <Button
             variant="contained"
             onClick={() => setIsAppointmentModalOpen(true)}
-            sx={{ mt: 4 }}
+            sx={{ mt: 4, width: { xs: '100%', sm: 'auto' } }}
           >
             Add New Appointment
           </Button>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { userApi, groupApi } from "../services/api";
 import { User, Group } from "../types/models";
+import { Grid, Box, FormControl, InputLabel, Select, MenuItem, Button, Typography } from "@mui/material";
 
 const AdminUserForm: React.FC = () => {
   const navigate = useNavigate();
@@ -80,97 +81,95 @@ const AdminUserForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-blue-900 mb-4 sm:mb-6">
-        Edit User
-      </h1>
+    <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid item xs={12}>
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+          Edit User
+        </Typography>
+      </Grid>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            value={user.username}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-          />
-        </div>
+      <Grid item xs={12}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel id="username-label">Username</InputLabel>
+            <input
+              type="text"
+              name="username"
+              value={user.username}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+            />
+          </FormControl>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={user.email}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-          />
-        </div>
+          <FormControl fullWidth>
+            <InputLabel id="email-label">Email</InputLabel>
+            <input
+              type="email"
+              name="email"
+              value={user.email}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+            />
+          </FormControl>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Role
-          </label>
-          <select
-            name="role"
-            value={user.role}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-            <option value="superAdmin">Super Admin</option>
-          </select>
-        </div>
+          <FormControl fullWidth>
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              name="role"
+              value={user.role}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="superAdmin">Super Admin</MenuItem>
+            </Select>
+          </FormControl>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Groups
-          </label>
-          <select
-            multiple
-            name="groups"
-            value={user.groups as string[]}
-            onChange={handleGroupChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base min-h-[120px]"
-          >
-            {groups.map((group) => (
-              <option key={group._id} value={group._id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
-          <p className="mt-1 text-xs sm:text-sm text-gray-500">
-            Hold Ctrl (Cmd on Mac) to select multiple groups
-          </p>
-        </div>
+          <FormControl fullWidth>
+            <InputLabel id="groups-label">Groups</InputLabel>
+            <Select
+              labelId="groups-label"
+              multiple
+              name="groups"
+              value={user.groups as string[]}
+              onChange={handleGroupChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base min-h-[120px]"
+            >
+              {groups.map((group) => (
+                <MenuItem key={group._id} value={group._id}>
+                  {group.name}
+                </MenuItem>
+              ))}
+            </Select>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Hold Ctrl (Cmd on Mac) to select multiple groups
+            </Typography>
+          </FormControl>
 
-        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate("/admin/users")}
-            className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-          >
-            {isLoading ? "Saving..." : "Update User"}
-          </button>
-        </div>
-      </form>
-    </div>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              type="button"
+              onClick={() => navigate("/admin/users")}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            >
+              {isLoading ? "Saving..." : "Update User"}
+            </Button>
+          </Box>
+        </Box>
+      </Grid>
+    </Grid>
   );
 };
 

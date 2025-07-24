@@ -11,6 +11,12 @@ import {
   userApi,
 } from "../services/api";
 import { FiTrash2 } from "react-icons/fi";
+import {
+  Paper,
+  TableContainer,
+  Button,
+  Typography,
+} from "@mui/material";
 
 const AdminMedicationUpdatesPage: React.FC = () => {
   const [updates, setUpdates] = useState<MedicationUpdate[]>([]);
@@ -132,9 +138,9 @@ const AdminMedicationUpdatesPage: React.FC = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-blue-900">
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
           Medication Updates History
-        </h1>
+        </Typography>
       </div>
 
       {/* Filters */}
@@ -191,17 +197,18 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full"
             />
           </div>
-          <button
+          <Button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full lg:w-auto"
+            variant="contained"
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             Filter by Date
-          </button>
+          </Button>
         </form>
       </div>
 
       {/* Updates Table */}
-      <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
         <div className="inline-block min-w-full py-2 align-middle px-4 sm:px-6 lg:px-8">
           <div className="shadow ring-1 ring-black ring-opacity-5 rounded-lg overflow-hidden">
             <table className="min-w-full divide-y divide-gray-300">
@@ -307,7 +314,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
             </table>
           </div>
         </div>
-      </div>
+      </TableContainer>
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
@@ -328,20 +335,20 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="contained"
                   onClick={() => handleDelete(selectedUpdateId)}
-                  className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Delete
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outlined"
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>

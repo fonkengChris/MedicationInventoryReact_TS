@@ -4,6 +4,19 @@ import { medicationApi } from "../services/api";
 import { Medication } from "../types/models";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableFooter,
+  TablePagination,
+  Button,
+  Typography,
+} from "@mui/material";
 
 const AdminMedicationsPage: React.FC = () => {
   const [medications, setMedications] = useState<Medication[]>([]);
@@ -55,85 +68,87 @@ const AdminMedicationsPage: React.FC = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-blue-900">
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
           Medications Management
-        </h1>
-        <Link
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          component={Link}
           to="/admin/medications/new"
-          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-center"
         >
           Add Medication
-        </Link>
+        </Button>
       </div>
 
       {medications.length === 0 ? (
         <p className="text-gray-500 text-center py-4">No medications found.</p>
       ) : (
-        <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle">
-            <div className="shadow-sm ring-1 ring-black ring-opacity-5">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6">
-                      Name
-                    </th>
-                    <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                      Dosage
-                    </th>
-                    <th className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                      Manufacturer
-                    </th>
-                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {medications.map((medication) => (
-                    <tr key={medication._id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                        <div className="font-medium text-gray-900">
-                          {medication.name}
-                        </div>
-                        <div className="sm:hidden text-gray-500 mt-1">
-                          {medication.dosage}
-                        </div>
-                      </td>
-                      <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
-                        {medication.dosage}
-                      </td>
-                      <td className="hidden md:table-cell px-3 py-4 text-sm text-gray-500">
-                        {medication.manufacturer || "-"}
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <div className="flex justify-end gap-2">
-                          <Link
-                            to={`/admin/medications/edit/${medication._id}`}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
-                            <EditIcon className="h-5 w-5" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                          <button
-                            onClick={() => {
-                              setSelectedMedicationId(medication._id!);
-                              setIsDeleteModalOpen(true);
-                            }}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <DeleteIcon className="h-5 w-5" />
-                            <span className="sr-only">Delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
+          <Table className="min-w-full divide-y divide-gray-300">
+            <TableHead className="bg-gray-50">
+              <TableRow>
+                <TableCell className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6">
+                  Name
+                </TableCell>
+                <TableCell className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                  Dosage
+                </TableCell>
+                <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
+                  Manufacturer
+                </TableCell>
+                <TableCell className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <span className="sr-only">Actions</span>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className="divide-y divide-gray-200 bg-white">
+              {medications.map((medication) => (
+                <TableRow key={medication._id}>
+                  <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                    <div className="font-medium text-gray-900">
+                      {medication.name}
+                    </div>
+                    <div className="sm:hidden text-gray-500 mt-1">
+                      {medication.dosage}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                    {medication.dosage}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell px-3 py-4 text-sm text-gray-500">
+                    {medication.manufacturer || "-"}
+                  </TableCell>
+                  <TableCell className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="text"
+                        color="primary"
+                        component={Link}
+                        to={`/admin/medications/edit/${medication._id}`}
+                      >
+                        <EditIcon className="h-5 w-5" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        variant="text"
+                        color="error"
+                        onClick={() => {
+                          setSelectedMedicationId(medication._id!);
+                          setIsDeleteModalOpen(true);
+                        }}
+                      >
+                        <DeleteIcon className="h-5 w-5" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -155,20 +170,21 @@ const AdminMedicationsPage: React.FC = () => {
                 </div>
               </div>
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="contained"
+                  color="error"
                   onClick={() => handleDelete(selectedMedicationId)}
-                  className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Delete
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outlined"
                   onClick={() => setIsDeleteModalOpen(false)}
-                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           </div>

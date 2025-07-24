@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { groupApi } from "../services/api";
 import { Group } from "../types/models";
 import { jwtDecode } from "jwt-decode";
+import { Grid, Button, Typography } from "@mui/material";
 
 interface DecodedToken {
   _id: string;
@@ -78,57 +79,67 @@ const AdminGroupForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-blue-900 mb-4 sm:mb-6">
-        {id ? "Edit Group" : "Add Group"}
-      </h1>
+    <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid item xs={12}>
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+          {id ? "Edit Group" : "Add Group"}
+        </Typography>
+      </Grid>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={group.name}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-          />
-        </div>
+      <Grid item xs={12}>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12}>
+              <Typography variant="body2" color="text.secondary">
+                Name
+              </Typography>
+              <input
+                type="text"
+                name="name"
+                value={group.name}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              />
+            </Grid>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={group.description}
-            onChange={handleChange}
-            rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-          />
-        </div>
+            <Grid item xs={12}>
+              <Typography variant="body2" color="text.secondary">
+                Description
+              </Typography>
+              <textarea
+                name="description"
+                value={group.description}
+                onChange={handleChange}
+                rows={4}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              />
+            </Grid>
 
-        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate("/admin/groups")}
-            className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-          >
-            {isLoading ? "Saving..." : id ? "Update Group" : "Add Group"}
-          </button>
-        </div>
-      </form>
-    </div>
+            <Grid item xs={12}>
+              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
+                <Button
+                  type="button"
+                  onClick={() => navigate("/admin/groups")}
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+                >
+                  {isLoading ? "Saving..." : id ? "Update Group" : "Add Group"}
+                </Button>
+              </div>
+            </Grid>
+          </Grid>
+        </form>
+      </Grid>
+    </Grid>
   );
 };
 

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { appointmentApi, serviceUserApi } from "../services/api";
 import { Appointment, ServiceUser } from "../types/models";
 import { jwtDecode } from "jwt-decode";
+import { Grid, Button, Typography } from "@mui/material";
 
 interface DecodedToken {
   _id: string;
@@ -118,56 +119,58 @@ const AdminAppointmentForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-blue-900 mb-4 sm:mb-6">
-        {id ? "Edit Appointment" : "Add Appointment"}
-      </h1>
+    <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid item xs={12}>
+        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+          {id ? "Edit Appointment" : "Add Appointment"}
+        </Typography>
+      </Grid>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Service User
-            </label>
-            <select
-              name="serviceUser"
-              value={appointment.serviceUser as string}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            >
-              <option value="">Select Service User</option>
-              {serviceUsers.map((user) => (
-                <option key={user._id} value={user._id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Appointment Type
-            </label>
-            <select
-              name="appointmentType"
-              value={appointment.appointmentType}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            >
-              {["Medical", "Dental", "Therapy", "Review", "Other"].map(
-                (type) => (
-                  <option key={type} value={type}>
-                    {type}
+      <Grid item xs={12}>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Service User
+              </label>
+              <select
+                name="serviceUser"
+                value={appointment.serviceUser as string}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              >
+                <option value="">Select Service User</option>
+                {serviceUsers.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name}
                   </option>
-                )
-              )}
-            </select>
-          </div>
+                ))}
+              </select>
+            </Grid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Appointment Type
+              </label>
+              <select
+                name="appointmentType"
+                value={appointment.appointmentType}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              >
+                {["Medical", "Dental", "Therapy", "Review", "Other"].map(
+                  (type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  )
+                )}
+              </select>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Date & Time
               </label>
@@ -179,8 +182,8 @@ const AdminAppointmentForm: React.FC = () => {
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Duration (minutes)
               </label>
@@ -193,130 +196,88 @@ const AdminAppointmentForm: React.FC = () => {
                 min="0"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-          </div>
+            </Grid>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={appointment.location}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">
-              Provider Details
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="provider.name"
-                  value={appointment.provider?.name}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
-                </label>
-                <input
-                  type="text"
-                  name="provider.role"
-                  value={appointment.provider?.role}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-                />
-              </div>
-            </div>
-            <div>
+            <Grid item xs={12}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Number
+                Location
               </label>
               <input
-                type="tel"
-                name="provider.contactNumber"
-                value={appointment.provider?.contactNumber}
+                type="text"
+                name="location"
+                value={appointment.location}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
               />
-            </div>
-          </div>
+            </Grid>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={appointment.status}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            >
-              {[
-                "Scheduled",
-                "Completed",
-                "Cancelled",
-                "Rescheduled",
-                "NoShow",
-              ].map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                value={appointment.status}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              >
+                {[
+                  "Scheduled",
+                  "Completed",
+                  "Cancelled",
+                  "Rescheduled",
+                  "NoShow",
+                ].map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </Grid>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
-            <textarea
-              name="notes"
-              value={appointment.notes}
-              onChange={handleChange}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            />
-          </div>
-        </div>
+            <Grid item xs={12}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notes
+              </label>
+              <textarea
+                name="notes"
+                value={appointment.notes}
+                onChange={handleChange}
+                rows={3}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+              />
+            </Grid>
+          </Grid>
 
-        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate("/admin/appointments")}
-            className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-          >
-            {isLoading
-              ? "Saving..."
-              : id
-              ? "Update Appointment"
-              : "Add Appointment"}
-          </button>
-        </div>
-      </form>
-    </div>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid item xs={12} sm={6}>
+              <Button
+                type="button"
+                onClick={() => navigate("/admin/appointments")}
+                className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
+              >
+                Cancel
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+              >
+                {isLoading
+                  ? "Saving..."
+                  : id
+                  ? "Update Appointment"
+                  : "Add Appointment"}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Grid>
+    </Grid>
   );
 };
 
