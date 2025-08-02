@@ -14,9 +14,18 @@ import {
   TableRow,
   Typography,
   Button,
+  Box,
+  useMediaQuery,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 
 const AdminGroupsPage: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [groups, setGroups] = useState<Group[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
@@ -44,135 +53,336 @@ const AdminGroupsPage: React.FC = () => {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 2, md: 3 },
+        maxWidth: "100%",
+        overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
+      }}
+    >
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           Groups Management
         </Typography>
         <Button
           variant="contained"
-          color="primary"
           component={Link}
           to="/admin/groups/new"
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          sx={{
+            fontWeight: 'bold',
+            px: 3,
+            py: 1.5,
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+            textTransform: 'none',
+            background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+            color: '#ffffff',
+            '&:hover': {
+              background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
+              boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+              transform: 'translateY(-1px)'
+            },
+            transition: 'all 0.2s ease'
+          }}
         >
           Add Group
         </Button>
-      </div>
+      </Box>
 
-      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
-        <Table className="min-w-full divide-y divide-gray-300">
-          <TableHead className="bg-gray-50">
-            <TableRow>
-              <TableCell className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900 sm:pl-6">
-                Name
-              </TableCell>
-              <TableCell className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Description
-              </TableCell>
-              <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Created By
-              </TableCell>
-              <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Created At
-              </TableCell>
-              <TableCell className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span className="sr-only">Actions</span>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="divide-y divide-gray-200 bg-white">
-            {groups.map((group) => (
-              <TableRow key={group._id}>
-                <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                  <div className="font-medium text-gray-900">
-                    {group.name}
-                  </div>
-                  <div className="sm:hidden text-gray-500 mt-1">
-                    {group.description}
-                  </div>
-                </TableCell>
-                <TableCell className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
-                  {group.description}
-                </TableCell>
-                <TableCell className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {typeof group.createdBy === "object" &&
-                  group.createdBy !== null
-                    ? (group.createdBy as User).username
-                    : group.createdBy}
-                </TableCell>
-                <TableCell className="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {new Date(group.createdAt!).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                  <div className="flex justify-end gap-2">
-                    <Link
-                      to={`/admin/groups/edit/${group._id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      <EditIcon className="h-5 w-5" />
-                      <span className="sr-only">Edit</span>
-                    </Link>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => {
-                        setSelectedGroupId(group._id);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      sx={{ width: { xs: '100%', sm: 'auto' } }}
-                    >
-                      <DeleteIcon className="h-5 w-5" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-              <div className="sm:flex sm:items-start">
-                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    Delete Group
-                  </h3>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this group? This action
-                      cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
+      {groups.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography sx={{ color: '#666666' }}>No groups found.</Typography>
+        </Box>
+      ) : isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {groups.map((group) => (
+            <Card
+              key={group._id}
+              sx={{
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                border: '1px solid #e0e0e0',
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': { 
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                  borderColor: '#1976d2'
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, #7e57c2 0%, #9575cd 100%)',
+                  zIndex: 1
+                }
+              }}
+            >
+              <CardContent sx={{ pb: 1, position: 'relative', zIndex: 2 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 1, 
+                    color: '#1a1a1a',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {group.name}
+                </Typography>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Description:</span> {group.description}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Created By:</span> {typeof group.createdBy === "object" && group.createdBy !== null && 'username' in group.createdBy ? (group.createdBy as { username: string }).username : group.createdBy}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Created At:</span> {new Date(group.createdAt!).toLocaleDateString()}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0, gap: 1 }}>
                 <Button
                   variant="contained"
-                  color="error"
-                  onClick={() => handleDelete(selectedGroupId)}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  component={Link}
+                  to={`/admin/groups/edit/${group._id}`}
+                  sx={{
+                    fontWeight: 'bold',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    boxShadow: 1,
+                    textTransform: 'none',
+                    background: 'linear-gradient(90deg, #1976d2 60%, #1565c0 100%)',
+                    color: '#ffffff',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #1565c0 60%, #1976d2 100%)',
+                      boxShadow: 2,
+                      transform: 'translateY(-1px)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                  startIcon={<EditIcon />}
                 >
-                  Delete
+                  Edit
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  onClick={() => {
+                    setSelectedGroupId(group._id);
+                    setIsDeleteModalOpen(true);
+                  }}
+                  sx={{
+                    fontWeight: 'bold',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    borderWidth: 2,
+                    textTransform: 'none',
+                    borderColor: '#e53935',
+                    color: '#e53935',
+                    '&:hover': {
+                      background: '#ffebee',
+                      borderColor: '#b71c1c',
+                      color: '#b71c1c',
+                      transform: 'translateY(-1px)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                  startIcon={<DeleteIcon />}
                 >
-                  Cancel
+                  Delete
                 </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            overflowX: 'auto', 
+            '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } },
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e0e0e0'
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Name
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Description
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Created By
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Created At
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {groups.map((group) => (
+                <TableRow 
+                  key={group._id}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      transition: 'background-color 0.2s ease'
+                    }
+                  }}
+                >
+                  <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
+                    {group.name}
+                  </TableCell>
+                  <TableCell sx={{ color: '#666666' }}>
+                    {group.description}
+                  </TableCell>
+                  <TableCell sx={{ color: '#666666' }}>
+                    {typeof group.createdBy === "object" &&
+                    group.createdBy !== null
+                      ? (group.createdBy as User).username
+                      : group.createdBy}
+                  </TableCell>
+                  <TableCell sx={{ color: '#666666' }}>
+                    {new Date(group.createdAt!).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                      <Button
+                        component={Link}
+                        to={`/admin/groups/edit/${group._id}`}
+                        sx={{
+                          color: '#1976d2',
+                          '&:hover': {
+                            backgroundColor: '#e3f2fd',
+                            color: '#1565c0'
+                          }
+                        }}
+                      >
+                        <EditIcon />
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedGroupId(group._id);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        sx={{
+                          color: '#e53935',
+                          '&:hover': {
+                            backgroundColor: '#ffebee',
+                            color: '#b71c1c'
+                          }
+                        }}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              p: 4,
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              border: '1px solid #e0e0e0'
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, color: '#1a1a1a', fontWeight: 'bold' }}>
+              Delete Group
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: '#666666' }}>
+              Are you sure you want to delete this group? This action cannot be undone.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+              <Button
+                onClick={() => setIsDeleteModalOpen(false)}
+                sx={{
+                  color: '#666666',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleDelete(selectedGroupId)}
+                variant="contained"
+                sx={{
+                  backgroundColor: '#e53935',
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: '#b71c1c'
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 };
 

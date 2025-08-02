@@ -46,9 +46,17 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-md p-4">
+      <nav className="bg-blue-600 shadow-md p-4">
         <div className="container mx-auto flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold">
+          <Link 
+            to="/" 
+            className="text-xl font-bold"
+            style={{ 
+              color: '#ffffff',
+              fontWeight: 'bold',
+              textDecoration: 'none'
+            }}
+          >
             MedTracker
           </Link>
 
@@ -56,14 +64,63 @@ const Layout: React.FC = () => {
           <div className="hidden sm:flex items-center space-x-4">
             {isAuthenticated && (
               <>
-                <Link to="/appointments" className="hover:text-blue-600">
+                <Link 
+                  to="/appointments" 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Appointments
                 </Link>
-                <Link to="/medications" className="hover:text-blue-600">
+                <Link 
+                  to="/medications" 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Medications
                 </Link>
                 {isAdmin() && (
-                  <Link to="/admin" className="hover:text-blue-600">
+                  <Link 
+                    to="/admin" 
+                    style={{ 
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      textDecoration: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      backgroundColor: '#1565c0',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0d47a1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1565c0';
+                    }}
+                  >
                     Admin
                   </Link>
                 )}
@@ -75,11 +132,16 @@ const Layout: React.FC = () => {
           {isAuthenticated && (
             <div className="sm:hidden absolute left-1/2 -translate-x-1/2">
               <IconButton
-                color="inherit"
                 onClick={handleMenuOpen}
                 aria-label="menu"
+                sx={{
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
               >
-                <MenuIcon />
+                <MenuIcon sx={{ color: '#ffffff' }} />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}
@@ -93,11 +155,27 @@ const Layout: React.FC = () => {
                   vertical: "top",
                   horizontal: "center",
                 }}
+                PaperProps={{
+                  sx: {
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                    borderRadius: 2,
+                    mt: 1
+                  }
+                }}
               >
                 <MenuItem
                   onClick={handleMenuClose}
                   component={Link}
                   to="/appointments"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#1a1a1a',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      color: '#1a1a1a'
+                    }
+                  }}
                 >
                   Appointments
                 </MenuItem>
@@ -105,6 +183,14 @@ const Layout: React.FC = () => {
                   onClick={handleMenuClose}
                   component={Link}
                   to="/medications"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#1a1a1a',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      color: '#1a1a1a'
+                    }
+                  }}
                 >
                   Medications
                 </MenuItem>
@@ -113,6 +199,15 @@ const Layout: React.FC = () => {
                     onClick={handleMenuClose}
                     component={Link}
                     to="/admin"
+                    sx={{
+                      fontWeight: 'bold',
+                      color: '#1976d2',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': {
+                        backgroundColor: '#bbdefb',
+                        color: '#1565c0'
+                      }
+                    }}
                   >
                     Admin
                   </MenuItem>
@@ -125,17 +220,71 @@ const Layout: React.FC = () => {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <span className="text-gray-600">Welcome: {getUserName()}</span>
-                <button onClick={handleLogout} className="hover:text-blue-600">
+                <span style={{ color: '#ffffff', fontWeight: 500 }}>
+                  Welcome: {getUserName()}
+                </span>
+                <button 
+                  onClick={handleLogout} 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '2px solid #ffffff',
+                    backgroundColor: 'transparent',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/auth" className="hover:text-blue-600">
+                <Link 
+                  to="/auth" 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Login
                 </Link>
-                <Link to="/register" className="hover:text-blue-600">
+                <Link 
+                  to="/register" 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: '2px solid #ffffff',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Register
                 </Link>
               </>

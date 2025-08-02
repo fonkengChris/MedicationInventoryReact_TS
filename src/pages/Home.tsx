@@ -264,10 +264,23 @@ const Home = () => {
   return (
     <>
       <Box sx={{ p: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: { xs: '2rem', sm: '2.5rem' } }}>
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          gutterBottom 
+          sx={{ 
+            fontSize: { xs: '2rem', sm: '2.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold'
+          }}
+        >
           Welcome to MedTracker
         </Typography>
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography 
+          variant="subtitle1" 
+          gutterBottom
+          sx={{ color: '#2c2c2c', fontWeight: 500 }}
+        >
           Please select a service user to manage their medications
         </Typography>
         {(() => {
@@ -283,8 +296,7 @@ const Home = () => {
                   <Box sx={{ mb: 2 }}>
                     <Typography
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
+                      sx={{ mb: 1, color: '#424242', fontWeight: 500 }}
                     >
                       You have access to service users in your assigned groups:{" "}
                       {Array.isArray(currentUser.groups)
@@ -306,7 +318,10 @@ const Home = () => {
         })()}
 
         <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel id="service-user-label">
+          <InputLabel 
+            id="service-user-label"
+            sx={{ color: '#424242', fontWeight: 500 }}
+          >
             {localStorage.getItem("token")
               ? "Service User"
               : "Please log in to view service users"}
@@ -325,6 +340,16 @@ const Home = () => {
               isLoadingUsers ||
               isLoadingCurrentUser
             }
+            sx={{
+              '& .MuiSelect-select': {
+                color: '#1a1a1a',
+                fontWeight: 500
+              },
+              '& .MuiMenuItem-root': {
+                color: '#1a1a1a',
+                fontWeight: 500
+              }
+            }}
           >
             {localStorage.getItem("token") ? (
               filteredServiceUsers.map((user) => (
@@ -388,24 +413,32 @@ const Home = () => {
                   </Avatar>
                   <Typography
                     variant="h5"
-                    sx={{ mt: 2, textAlign: { xs: "center", sm: "left" } }}
+                    sx={{ 
+                      mt: 2, 
+                      textAlign: { xs: "center", sm: "left" },
+                      color: '#1a1a1a',
+                      fontWeight: 'bold'
+                    }}
                   >
                     {serviceUsers.find((u) => u._id === selectedUser)?.name}
                   </Typography>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="body1">
-                    <strong>Peronal Info:</strong>
+                  <Typography 
+                    variant="body1"
+                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+                  >
+                    Personal Info:
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" sx={{ color: '#424242', fontWeight: 500 }}>
                     NHS Number:{" "}
                     {
                       serviceUsers.find((u) => u._id === selectedUser)
                         ?.nhsNumber
                     }
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" sx={{ color: '#424242', fontWeight: 500 }}>
                     DOB:{" "}
                     {new Date(
                       serviceUsers.find((u) => u._id === selectedUser)
@@ -415,13 +448,16 @@ const Home = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="body1">
-                    <strong>Address:</strong>
+                  <Typography 
+                    variant="body1"
+                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+                  >
+                    Address:
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
                     {serviceUsers.find((u) => u._id === selectedUser)?.address}
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
                     Phone:{" "}
                     {
                       serviceUsers.find((u) => u._id === selectedUser)
@@ -431,10 +467,13 @@ const Home = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="body1">
-                    <strong>Emergency Contact:</strong>
+                  <Typography 
+                    variant="body1"
+                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+                  >
+                    Emergency Contact:
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
                     {
                       serviceUsers.find((u) => u._id === selectedUser)
                         ?.emergencyContact.name
@@ -446,7 +485,7 @@ const Home = () => {
                     }
                     )
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
                     Phone:{" "}
                     {
                       serviceUsers.find((u) => u._id === selectedUser)
@@ -474,14 +513,14 @@ const Home = () => {
             <Table>
               <TableHead>
                 <TableRow sx={{ borderBottom: "2px solid #81D4FA" }}>
-                  <TableCell>Medication Name</TableCell>
-                  <TableCell>Dosage</TableCell>
-                  <TableCell>Stock Level</TableCell>
-                  <TableCell>Frequency</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell>Prescribed By</TableCell>
-                  <TableCell>Instructions</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Medication Name</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Dosage</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Stock Level</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Frequency</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Start Date</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Prescribed By</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Instructions</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -494,15 +533,15 @@ const Home = () => {
                       },
                     }}
                   >
-                    <TableCell>{medication.medicationName}</TableCell>
-                    <TableCell>{`${medication.dosage.amount} ${medication.dosage.unit}`}</TableCell>
-                    <TableCell>{medication.quantityInStock}</TableCell>
-                    <TableCell>{medication.frequency}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.medicationName}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{`${medication.dosage.amount} ${medication.dosage.unit}`}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.quantityInStock}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.frequency}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
                       {new Date(medication.startDate).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>{medication.prescribedBy}</TableCell>
-                    <TableCell>{medication.instructions}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.prescribedBy}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.instructions}</TableCell>
                     <TableCell>
                       <Tooltip title="Add Stock">
                         <IconButton
@@ -530,7 +569,15 @@ const Home = () => {
 
         {selectedUser && filteredAppointments.length > 0 && (
           <>
-            <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                mt: 4, 
+                mb: 2,
+                color: '#1a1a1a',
+                fontWeight: 'bold'
+              }}
+            >
               Upcoming Appointments
             </Typography>
             <TableContainer
@@ -546,13 +593,13 @@ const Home = () => {
               <Table>
                 <TableHead>
                   <TableRow sx={{ borderBottom: "2px solid #80DEEA" }}>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Date & Time</TableCell>
-                    <TableCell>Duration</TableCell>
-                    <TableCell>Location</TableCell>
-                    <TableCell>Provider</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Notes</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Type</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Date & Time</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Duration</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Location</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Provider</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Status</TableCell>
+                    <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Notes</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -567,17 +614,17 @@ const Home = () => {
                           },
                         }}
                       >
-                        <TableCell>{appointment.appointmentType}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{appointment.appointmentType}</TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
                           {new Date(appointment.dateTime).toLocaleString()}
                         </TableCell>
-                        <TableCell>{appointment.duration} mins</TableCell>
-                        <TableCell>{appointment.location}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{appointment.duration} mins</TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{appointment.location}</TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
                           {`${appointment.provider.name} (${appointment.provider.role})`}
                         </TableCell>
-                        <TableCell>{appointment.status}</TableCell>
-                        <TableCell>{appointment.notes}</TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{appointment.status}</TableCell>
+                        <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{appointment.notes}</TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -587,7 +634,7 @@ const Home = () => {
         )}
 
         {selectedUser && filteredAppointments.length === 0 && (
-          <Typography sx={{ mt: 4 }} color="text.secondary">
+          <Typography sx={{ mt: 4, color: '#666666', fontWeight: 500 }}>
             No upcoming appointments found.
           </Typography>
         )}
@@ -596,7 +643,17 @@ const Home = () => {
           <Button
             variant="contained"
             onClick={() => setIsAppointmentModalOpen(true)}
-            sx={{ mt: 4, width: { xs: '100%', sm: 'auto' } }}
+            sx={{ 
+              mt: 4, 
+              width: { xs: '100%', sm: 'auto' },
+              backgroundColor: '#1976d2',
+              color: '#ffffff',
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+                color: '#ffffff'
+              }
+            }}
           >
             Add New Appointment
           </Button>
@@ -623,7 +680,11 @@ const Home = () => {
             borderRadius: 2,
           }}
         >
-          <Typography variant="h6" gutterBottom>
+          <Typography 
+            variant="h6" 
+            gutterBottom
+            sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+          >
             {selectedMedication?.medicationName}
           </Typography>
           <TextField
@@ -636,8 +697,18 @@ const Home = () => {
             sx={{ my: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Notes</InputLabel>
-            <Select value={notes} onChange={handleNotesChange} label="Notes">
+            <InputLabel sx={{ color: '#424242', fontWeight: 500 }}>Notes</InputLabel>
+            <Select 
+              value={notes} 
+              onChange={handleNotesChange} 
+              label="Notes"
+              sx={{
+                '& .MuiSelect-select': {
+                  color: '#1a1a1a',
+                  fontWeight: 500
+                }
+              }}
+            >
               {noteOptions.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -648,11 +719,32 @@ const Home = () => {
           <Button
             variant="contained"
             onClick={isServing ? handleSubmitServe : handleSubmitStock}
-            sx={{ mr: 1 }}
+            sx={{ 
+              mr: 1,
+              backgroundColor: '#1976d2',
+              color: '#ffffff',
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+                color: '#ffffff'
+              }
+            }}
           >
             {isServing ? "Serve" : "Add Stock"}
           </Button>
-          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+          <Button 
+            onClick={() => setIsModalOpen(false)}
+            sx={{ 
+              color: '#424242',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#f5f5f5',
+                color: '#1a1a1a'
+              }
+            }}
+          >
+            Cancel
+          </Button>
         </Box>
       </Modal>
       <Modal
@@ -675,13 +767,21 @@ const Home = () => {
             overflow: "auto",
           }}
         >
-          <Typography variant="h6" component="h2" sx={{ mb: 3 }}>
+          <Typography 
+            variant="h6" 
+            component="h2" 
+            sx={{ 
+              mb: 3,
+              color: '#1a1a1a',
+              fontWeight: 'bold'
+            }}
+          >
             Add New Appointment
           </Typography>
 
           <form onSubmit={handleAppointmentSubmit} className="space-y-4">
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Appointment Type</InputLabel>
+              <InputLabel sx={{ color: '#424242', fontWeight: 500 }}>Appointment Type</InputLabel>
               <Select
                 name="appointmentType"
                 value={newAppointment.appointmentType}
@@ -697,6 +797,12 @@ const Home = () => {
                   }))
                 }
                 required
+                sx={{
+                  '& .MuiSelect-select': {
+                    color: '#1a1a1a',
+                    fontWeight: 500
+                  }
+                }}
               >
                 {["Medical", "Dental", "Therapy", "Review", "Other"].map(
                   (type) => (
@@ -722,7 +828,10 @@ const Home = () => {
               }
               required
               sx={{ mb: 2 }}
-              InputLabelProps={{ shrink: true }}
+              InputLabelProps={{ 
+                shrink: true,
+                sx: { color: '#424242', fontWeight: 500 }
+              }}
             />
 
             <TextField
@@ -739,6 +848,7 @@ const Home = () => {
               }
               required
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
             <TextField
@@ -754,9 +864,17 @@ const Home = () => {
               }
               required
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
-            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                mb: 2,
+                color: '#1a1a1a',
+                fontWeight: 'bold'
+              }}
+            >
               Provider Details
             </Typography>
 
@@ -773,6 +891,7 @@ const Home = () => {
               }
               required
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
             <TextField
@@ -788,6 +907,7 @@ const Home = () => {
               }
               required
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
             <TextField
@@ -805,6 +925,7 @@ const Home = () => {
                 }))
               }
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
             <TextField
@@ -821,13 +942,36 @@ const Home = () => {
                 }))
               }
               sx={{ mb: 2 }}
+              InputLabelProps={{ sx: { color: '#424242', fontWeight: 500 } }}
             />
 
             <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-              <Button onClick={() => setIsAppointmentModalOpen(false)}>
+              <Button 
+                onClick={() => setIsAppointmentModalOpen(false)}
+                sx={{ 
+                  color: '#424242',
+                  fontWeight: 500,
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5',
+                    color: '#1a1a1a'
+                  }
+                }}
+              >
                 Cancel
               </Button>
-              <Button type="submit" variant="contained">
+              <Button 
+                type="submit" 
+                variant="contained"
+                sx={{ 
+                  backgroundColor: '#1976d2',
+                  color: '#ffffff',
+                  fontWeight: 'bold',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                    color: '#ffffff'
+                  }
+                }}
+              >
                 Add Appointment
               </Button>
             </Box>

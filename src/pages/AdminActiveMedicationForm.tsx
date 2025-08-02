@@ -7,7 +7,7 @@ import {
 } from "../services/api";
 import { ActiveMedication, ServiceUser, Medication } from "../types/models";
 import { jwtDecode } from "jwt-decode";
-import { Grid, Button, Typography } from "@mui/material";
+import { Grid, Box, FormControl, InputLabel, Select, MenuItem, Button, Typography, TextField, SelectChangeEvent, Chip } from "@mui/material";
 
 const DOSAGE_UNITS = [
   "mg",
@@ -131,11 +131,10 @@ const AdminActiveMedicationForm: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string | number>
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+    const inputType = 'type' in e.target ? e.target.type : 'text';
 
     if (name.startsWith("dosage.")) {
       const field = name.split(".")[1];
@@ -143,13 +142,13 @@ const AdminActiveMedicationForm: React.FC = () => {
         ...prev,
         dosage: {
           ...prev.dosage!,
-          [field]: type === "number" ? Number(value) : value,
+          [field]: inputType === "number" ? Number(value) : value,
         } as ActiveMedication["dosage"],
       }));
     } else {
       setActiveMedication((prev) => ({
         ...prev,
-        [name]: type === "number" ? Number(value) : value,
+        [name]: inputType === "number" ? Number(value) : value,
       }));
     }
   };
@@ -182,273 +181,502 @@ const AdminActiveMedicationForm: React.FC = () => {
   };
 
   return (
-    <Grid container spacing={{ xs: 2, sm: 3 }}>
-      <Grid item xs={12}>
-        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 2, md: 3 },
+        maxWidth: "100%",
+        overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
+      }}
+    >
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           {id ? "Edit Active Medication" : "Add Active Medication"}
         </Typography>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12}>
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Box
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          p: 4
+        }}
+      >
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Grid container spacing={3}>
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Service User
-              </label>
-              <select
-                name="serviceUser"
-                value={
-                  typeof activeMedication.serviceUser === "object"
-                    ? activeMedication.serviceUser._id
-                    : activeMedication.serviceUser || ""
-                }
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                <option value="">Select Service User</option>
-                {serviceUsers.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Service User</InputLabel>
+                <Select
+                  name="serviceUser"
+                  value={
+                    typeof activeMedication.serviceUser === "object"
+                      ? activeMedication.serviceUser._id
+                      : activeMedication.serviceUser || ""
+                  }
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  <MenuItem value="">Select Service User</MenuItem>
+                  {serviceUsers.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Medication
-              </label>
-              <select
-                name="medicationName"
-                value={activeMedication.medicationName}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                <option value="">Select Medication</option>
-                {medications.map((med) => (
-                  <option key={med._id} value={med.name}>
-                    {med.name} - {med.dosage}
-                  </option>
-                ))}
-              </select>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Medication</InputLabel>
+                <Select
+                  name="medicationName"
+                  value={activeMedication.medicationName}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  <MenuItem value="">Select Medication</MenuItem>
+                  {medications.map((med) => (
+                    <MenuItem key={med._id} value={med.name}>
+                      {med.name} - {med.dosage}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dosage Amount
-              </label>
-              <input
-                type="number"
+              <TextField
+                fullWidth
+                label="Dosage Amount"
                 name="dosage.amount"
+                type="number"
                 value={activeMedication.dosage?.amount}
                 onChange={handleChange}
                 required
-                min="0"
-                step="0.1"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                inputProps={{ min: 0, step: 0.1 }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dosage Unit
-              </label>
-              <select
-                name="dosage.unit"
-                value={activeMedication.dosage?.unit}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                {DOSAGE_UNITS.map((unit) => (
-                  <option key={unit} value={unit}>
-                    {unit}
-                  </option>
-                ))}
-              </select>
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity in Stock
-              </label>
-              <input
-                type="number"
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Dosage Unit</InputLabel>
+                <Select
+                  name="dosage.unit"
+                  value={activeMedication.dosage?.unit}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  {DOSAGE_UNITS.map((unit) => (
+                    <MenuItem key={unit} value={unit}>
+                      {unit}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Quantity in Stock"
                 name="quantityInStock"
+                type="number"
                 value={activeMedication.quantityInStock}
                 onChange={handleChange}
                 required
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                inputProps={{ min: 0 }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity per Dose
-              </label>
-              <input
-                type="number"
+              <TextField
+                fullWidth
+                label="Quantity per Dose"
                 name="quantityPerDose"
+                type="number"
                 value={activeMedication.quantityPerDose}
                 onChange={handleChange}
                 required
-                min="0"
-                step="0.1"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                inputProps={{ min: 0, step: 0.1 }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Doses per Day
-              </label>
-              <input
-                type="number"
+              <TextField
+                fullWidth
+                label="Doses per Day"
                 name="dosesPerDay"
+                type="number"
                 value={activeMedication.dosesPerDay}
                 onChange={handleChange}
                 required
-                min="1"
-                step="1"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                inputProps={{ min: 1, step: 1 }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
-          </Grid>
 
-          <Grid item xs={12}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Frequency
-            </label>
-            <input
-              type="text"
-              name="frequency"
-              value={activeMedication.frequency}
-              onChange={handleChange}
-              required
-              placeholder="e.g., Once daily, Twice daily, Every 4 hours"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            />
-          </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Frequency"
+                name="frequency"
+                value={activeMedication.frequency}
+                onChange={handleChange}
+                required
+                placeholder="e.g., Once daily, Twice daily, Every 4 hours"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
+              />
+            </Grid>
 
-          <Grid container spacing={{ xs: 2, sm: 3 }}>
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date
-              </label>
-              <input
-                type="date"
+              <TextField
+                fullWidth
+                label="Start Date"
                 name="startDate"
+                type="date"
                 value={activeMedication.startDate}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Date
-              </label>
-              <input
-                type="date"
+              <TextField
+                fullWidth
+                label="End Date"
                 name="endDate"
+                type="date"
                 value={activeMedication.endDate}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Prescribed By"
+                name="prescribedBy"
+                value={activeMedication.prescribedBy}
+                onChange={handleChange}
+                required
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Notes"
+                name="notes"
+                value={activeMedication.notes}
+                onChange={handleChange}
+                multiline
+                rows={3}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
+              />
+            </Grid>
+
+            {id && (
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="body1" sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>
+                      Status:
+                    </Typography>
+                    <Chip
+                      label={activeMedication.isActive ? "Active" : "Inactive"}
+                      color={activeMedication.isActive ? "success" : "error"}
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                  </Box>
+                  <Button
+                    type="button"
+                    onClick={() => handleActivationToggle(!activeMedication.isActive)}
+                    sx={{
+                      background: activeMedication.isActive 
+                        ? 'linear-gradient(90deg, #d32f2f 0%, #c62828 100%)'
+                        : 'linear-gradient(90deg, #2e7d32 0%, #1b5e20 100%)',
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      borderRadius: '8px',
+                      px: 3,
+                      py: 1.5,
+                      textTransform: 'none',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                      '&:hover': {
+                        background: activeMedication.isActive 
+                          ? 'linear-gradient(90deg, #c62828 0%, #d32f2f 100%)'
+                          : 'linear-gradient(90deg, #1b5e20 0%, #2e7d32 100%)',
+                        boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
+                        transform: 'translateY(-1px)'
+                      },
+                      '&:disabled': {
+                        background: '#e0e0e0',
+                        color: '#999999',
+                        boxShadow: 'none'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                    variant="contained"
+                    disabled={isLoading}
+                  >
+                    {isLoading
+                      ? "Updating..."
+                      : activeMedication.isActive
+                      ? "Deactivate Medication"
+                      : "Activate Medication"}
+                  </Button>
+                </Box>
+              </Grid>
+            )}
           </Grid>
 
-          <Grid item xs={12}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Prescribed By
-            </label>
-            <input
-              type="text"
-              name="prescribedBy"
-              value={activeMedication.prescribedBy}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
-            <textarea
-              name="notes"
-              value={activeMedication.notes}
-              onChange={handleChange}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-700 mr-2">
-                  Status:
-                </span>
-                <span
-                  className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                    activeMedication.isActive
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {activeMedication.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
-              <Button
-                type="button"
-                onClick={() => handleActivationToggle(!activeMedication.isActive)}
-                className={`px-4 py-2 rounded-md text-white ${
-                  activeMedication.isActive
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
-                disabled={isLoading}
-              >
-                {isLoading
-                  ? "Updating..."
-                  : activeMedication.isActive
-                  ? "Deactivate Medication"
-                  : "Activate Medication"}
-              </Button>
-            </div>
-          </Grid>
-        </form>
-      </Grid>
-
-      <Grid item xs={12}>
-        <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-6 pt-4 border-t border-gray-200">
-          <Button
-            type="button"
-            onClick={() => navigate("/admin/active-medications")}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
-            className="w-full sm:w-auto px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
-            className="w-full sm:w-auto px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-          >
-            {isLoading
-              ? "Saving..."
-              : id
-              ? "Update Active Medication"
-              : "Add Active Medication"}
-          </Button>
-        </div>
-      </Grid>
-    </Grid>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+            <Button
+              type="button"
+              onClick={() => navigate("/admin/active-medications")}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                borderColor: '#e0e0e0',
+                color: '#666666',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                px: 3,
+                py: 1.5,
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  backgroundColor: '#f5f5f5'
+                },
+                transition: 'all 0.2s ease'
+              }}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                px: 3,
+                py: 1.5,
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
+                  boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+                  transform: 'translateY(-1px)'
+                },
+                '&:disabled': {
+                  background: '#e0e0e0',
+                  color: '#999999',
+                  boxShadow: 'none'
+                },
+                transition: 'all 0.2s ease'
+              }}
+              variant="contained"
+            >
+              {isLoading
+                ? "Saving..."
+                : id
+                ? "Update Active Medication"
+                : "Add Active Medication"}
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

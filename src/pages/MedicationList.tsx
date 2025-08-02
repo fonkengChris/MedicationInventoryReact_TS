@@ -8,6 +8,7 @@ import {
   Box,
   useTheme,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 import { medicationApi } from "../services/api";
 import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
@@ -38,6 +39,8 @@ const MedicationList: React.FC = () => {
         p: { xs: 2, sm: 2, md: 3 },
         maxWidth: "100%",
         overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
       }}
     >
       <Typography
@@ -45,6 +48,10 @@ const MedicationList: React.FC = () => {
         sx={{
           mb: { xs: 2, sm: 3 },
           fontSize: { xs: "1.5rem", sm: "2rem" },
+          color: '#1a1a1a',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}
       >
         Medications
@@ -57,7 +64,28 @@ const MedicationList: React.FC = () => {
               sx={{
                 height: "100%",
                 cursor: "pointer",
-                "&:hover": { boxShadow: 6 },
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                border: '1px solid #e0e0e0',
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': { 
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                  borderColor: '#1976d2'
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+                  zIndex: 1
+                }
               }}
               onClick={() => navigate(`/medications/${medication._id}`)}
             >
@@ -65,6 +93,8 @@ const MedicationList: React.FC = () => {
                 sx={{
                   p: { xs: 2, sm: 3 },
                   "&:last-child": { pb: { xs: 2, sm: 3 } },
+                  position: 'relative',
+                  zIndex: 2
                 }}
               >
                 <Box
@@ -82,10 +112,26 @@ const MedicationList: React.FC = () => {
                     sx={{
                       fontSize: { xs: "1rem", sm: "1.25rem" },
                       flexGrow: 1,
+                      color: '#1a1a1a',
+                      fontWeight: 'bold',
+                      lineHeight: 1.2
                     }}
                   >
                     {medication.name}
                   </Typography>
+                  <Chip
+                    label="View Details"
+                    size="small"
+                    sx={{
+                      backgroundColor: '#e3f2fd',
+                      color: '#1976d2',
+                      fontWeight: 'bold',
+                      fontSize: '0.75rem',
+                      '&:hover': {
+                        backgroundColor: '#bbdefb'
+                      }
+                    }}
+                  />
                 </Box>
 
                 <Box
@@ -100,12 +146,17 @@ const MedicationList: React.FC = () => {
                       display: "flex",
                       alignItems: "flex-start",
                       gap: 1,
+                      p: 1.5,
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
                     }}
                   >
                     <MedicalInformationIcon
                       sx={{
                         fontSize: { xs: "1.25rem", sm: "1.5rem" },
                         mt: "2px",
+                        color: '#1976d2'
                       }}
                     />
                     <Typography
@@ -113,6 +164,8 @@ const MedicationList: React.FC = () => {
                       sx={{
                         fontSize: { xs: "0.875rem", sm: "1rem" },
                         wordBreak: "break-word",
+                        color: '#424242',
+                        fontWeight: 500
                       }}
                     >
                       Dosage: {medication.dosage}
@@ -125,12 +178,17 @@ const MedicationList: React.FC = () => {
                         display: "flex",
                         alignItems: "flex-start",
                         gap: 1,
+                        p: 1.5,
+                        backgroundColor: '#fff3e0',
+                        borderRadius: '8px',
+                        border: '1px solid #ffe0b2'
                       }}
                     >
                       <BusinessIcon
                         sx={{
                           fontSize: { xs: "1.25rem", sm: "1.5rem" },
                           mt: "2px",
+                          color: '#f57c00'
                         }}
                       />
                       <Typography
@@ -138,6 +196,8 @@ const MedicationList: React.FC = () => {
                         sx={{
                           fontSize: { xs: "0.875rem", sm: "1rem" },
                           wordBreak: "break-word",
+                          color: '#424242',
+                          fontWeight: 500
                         }}
                       >
                         {medication.manufacturer}
@@ -151,12 +211,17 @@ const MedicationList: React.FC = () => {
                         display: "flex",
                         alignItems: "flex-start",
                         gap: 1,
+                        p: 1.5,
+                        backgroundColor: '#e8f5e8',
+                        borderRadius: '8px',
+                        border: '1px solid #c8e6c9'
                       }}
                     >
                       <DescriptionIcon
                         sx={{
                           fontSize: { xs: "1.25rem", sm: "1.5rem" },
                           mt: "2px",
+                          color: '#388e3c'
                         }}
                       />
                       <Typography
@@ -164,6 +229,8 @@ const MedicationList: React.FC = () => {
                         sx={{
                           fontSize: { xs: "0.875rem", sm: "1rem" },
                           wordBreak: "break-word",
+                          color: '#424242',
+                          fontWeight: 500
                         }}
                       >
                         {medication.notes.split(" ").slice(0, 7).join(" ")}

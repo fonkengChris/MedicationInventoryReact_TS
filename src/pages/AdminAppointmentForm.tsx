@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { appointmentApi, serviceUserApi } from "../services/api";
 import { Appointment, ServiceUser } from "../types/models";
 import { jwtDecode } from "jwt-decode";
-import { Grid, Button, Typography } from "@mui/material";
+import { Grid, Button, Typography, Box, TextField, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 
 interface DecodedToken {
   _id: string;
@@ -96,9 +96,7 @@ const AdminAppointmentForm: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
   ) => {
     const { name, value } = e.target;
     if (name.startsWith("provider.")) {
@@ -119,165 +117,315 @@ const AdminAppointmentForm: React.FC = () => {
   };
 
   return (
-    <Grid container spacing={{ xs: 2, sm: 3 }}>
-      <Grid item xs={12}>
-        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 2, md: 3 },
+        maxWidth: "100%",
+        overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
+      }}
+    >
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           {id ? "Edit Appointment" : "Add Appointment"}
         </Typography>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12}>
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Box
+        sx={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          p: 4
+        }}
+      >
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Grid container spacing={3}>
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Service User
-              </label>
-              <select
-                name="serviceUser"
-                value={appointment.serviceUser as string}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                <option value="">Select Service User</option>
-                {serviceUsers.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Service User</InputLabel>
+                <Select
+                  name="serviceUser"
+                  value={appointment.serviceUser as string}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  <MenuItem value="">Select Service User</MenuItem>
+                  {serviceUsers.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Appointment Type
-              </label>
-              <select
-                name="appointmentType"
-                value={appointment.appointmentType}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                {["Medical", "Dental", "Therapy", "Review", "Other"].map(
-                  (type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  )
-                )}
-              </select>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Appointment Type</InputLabel>
+                <Select
+                  name="appointmentType"
+                  value={appointment.appointmentType}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  {["Medical", "Dental", "Therapy", "Review", "Other"].map(
+                    (type) => (
+                      <MenuItem key={type} value={type}>
+                        {type}
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date & Time
-              </label>
-              <input
-                type="datetime-local"
+              <TextField
+                fullWidth
+                label="Date & Time"
                 name="dateTime"
+                type="datetime-local"
                 value={appointment.dateTime}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Duration (minutes)
-              </label>
-              <input
-                type="number"
+              <TextField
+                fullWidth
+                label="Duration (minutes)"
                 name="duration"
+                type="number"
                 value={appointment.duration}
                 onChange={handleChange}
                 required
-                min="0"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                inputProps={{ min: 0 }}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
-              <input
-                type="text"
+              <TextField
+                fullWidth
+                label="Location"
                 name="location"
                 value={appointment.location}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                name="status"
-                value={appointment.status}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
-              >
-                {[
-                  "Scheduled",
-                  "Completed",
-                  "Cancelled",
-                  "Rescheduled",
-                  "NoShow",
-                ].map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#666666' }}>Status</InputLabel>
+                <Select
+                  name="status"
+                  value={appointment.status}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e0e0e0'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#1976d2'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  {[
+                    "Scheduled",
+                    "Completed",
+                    "Cancelled",
+                    "Rescheduled",
+                    "NoShow",
+                  ].map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid item xs={12}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
-              </label>
-              <textarea
+              <TextField
+                fullWidth
+                label="Notes"
                 name="notes"
                 value={appointment.notes}
                 onChange={handleChange}
+                multiline
                 rows={3}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm sm:text-base"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1976d2'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#666666'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a'
+                  }
+                }}
               />
             </Grid>
           </Grid>
 
-          <Grid container spacing={{ xs: 2, sm: 3 }}>
-            <Grid item xs={12} sm={6}>
-              <Button
-                type="button"
-                onClick={() => navigate("/admin/appointments")}
-                className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 text-sm sm:text-base"
-              >
-                Cancel
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full sm:w-auto px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-              >
-                {isLoading
-                  ? "Saving..."
-                  : id
-                  ? "Update Appointment"
-                  : "Add Appointment"}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Grid>
-    </Grid>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+            <Button
+              type="button"
+              onClick={() => navigate("/admin/appointments")}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                borderColor: '#e0e0e0',
+                color: '#666666',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                px: 3,
+                py: 1.5,
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  backgroundColor: '#f5f5f5'
+                },
+                transition: 'all 0.2s ease'
+              }}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                px: 3,
+                py: 1.5,
+                textTransform: 'none',
+                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
+                  boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+                  transform: 'translateY(-1px)'
+                },
+                '&:disabled': {
+                  background: '#e0e0e0',
+                  color: '#999999',
+                  boxShadow: 'none'
+                },
+                transition: 'all 0.2s ease'
+              }}
+              variant="contained"
+            >
+              {isLoading
+                ? "Saving..."
+                : id
+                ? "Update Appointment"
+                : "Add Appointment"}
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

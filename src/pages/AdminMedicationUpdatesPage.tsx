@@ -16,9 +16,20 @@ import {
   TableContainer,
   Button,
   Typography,
+  Box,
+  Chip,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
+import { Card, CardContent, CardActions, Divider, useMediaQuery } from '@mui/material';
 
 const AdminMedicationUpdatesPage: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [updates, setUpdates] = useState<MedicationUpdate[]>([]);
   const [activeMedications, setActiveMedications] = useState<
     ActiveMedication[]
@@ -108,17 +119,17 @@ const AdminMedicationUpdatesPage: React.FC = () => {
   const getUpdateTypeColor = (updateType: string) => {
     switch (updateType) {
       case "New Medication":
-        return "bg-green-100 text-green-800";
+        return { bg: '#e8f5e8', color: '#2e7d32' };
       case "MedStock Increase":
-        return "bg-blue-100 text-blue-800";
+        return { bg: '#e3f2fd', color: '#1976d2' };
       case "MedStock Decrease":
-        return "bg-yellow-100 text-yellow-800";
+        return { bg: '#fff3e0', color: '#f57c00' };
       case "Activated":
-        return "bg-green-100 text-green-800";
+        return { bg: '#e8f5e8', color: '#2e7d32' };
       case "Deactivated":
-        return "bg-red-100 text-red-800";
+        return { bg: '#ffebee', color: '#c62828' };
       default:
-        return "bg-purple-100 text-purple-800";
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
     }
   };
 
@@ -136,225 +147,523 @@ const AdminMedicationUpdatesPage: React.FC = () => {
   if (error) return <div className="text-red-600">Error: {error}</div>;
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 2, md: 3 },
+        maxWidth: "100%",
+        overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
+      }}
+    >
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           Medication Updates History
         </Typography>
-      </div>
+      </Box>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <select
-          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          onChange={(e) =>
-            setFilter({ medicationId: e.target.value || undefined })
-          }
-          value={filter.medicationId || ""}
-        >
-          <option value="">All Medications</option>
-          {activeMedications.map((med) => (
-            <option key={med._id} value={med._id}>
-              {med.medicationName}
-            </option>
-          ))}
-        </select>
+      <Box 
+        sx={{ 
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: '1fr 1fr 1fr 1fr' }, gap: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: '#666666' }}>All Medications</InputLabel>
+            <Select
+              value={filter.medicationId || ""}
+              onChange={(e) =>
+                setFilter({ medicationId: e.target.value || undefined })
+              }
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#e0e0e0'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#1976d2'
+                }
+              }}
+            >
+              <MenuItem value="">All Medications</MenuItem>
+              {activeMedications.map((med) => (
+                <MenuItem key={med._id} value={med._id}>
+                  {med.medicationName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <select
-          className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          onChange={(e) => setFilter({ userId: e.target.value || undefined })}
-          value={filter.userId || ""}
-        >
-          <option value="">All Users</option>
-          {users.map((user) => (
-            <option key={user._id} value={user._id}>
-              {user?.username || user?.email || "Unknown User"}
-            </option>
-          ))}
-        </select>
+          <FormControl fullWidth>
+            <InputLabel sx={{ color: '#666666' }}>All Users</InputLabel>
+            <Select
+              value={filter.userId || ""}
+              onChange={(e) => setFilter({ userId: e.target.value || undefined })}
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#e0e0e0'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#1976d2'
+                }
+              }}
+            >
+              <MenuItem value="">All Users</MenuItem>
+              {users.map((user) => (
+                <MenuItem key={user._id} value={user._id}>
+                  {user?.username || user?.email || "Unknown User"}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <form
-          onSubmit={handleDateRangeFilter}
-          className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end"
-        >
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date
-            </label>
-            <input
-              type="date"
-              name="startDate"
-              className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date
-            </label>
-            <input
-              type="date"
-              name="endDate"
-              className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full"
-            />
-          </div>
+          <TextField
+            type="date"
+            label="Start Date"
+            name="startDate"
+            fullWidth
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e0e0e0'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#1976d2'
+              }
+            }}
+          />
+
+          <TextField
+            type="date"
+            label="End Date"
+            name="endDate"
+            fullWidth
+            sx={{
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e0e0e0'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#1976d2'
+              }
+            }}
+          />
+        </Box>
+        
+        <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
           <Button
-            type="submit"
             variant="contained"
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
+            onClick={() => {
+              const form = document.querySelector('form');
+              if (form) {
+                handleDateRangeFilter(form as HTMLFormElement);
+              }
+            }}
+            sx={{
+              background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+              color: '#ffffff',
+              fontWeight: 'bold',
+              borderRadius: '8px',
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
+                boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+                transform: 'translateY(-1px)'
+              },
+              transition: 'all 0.2s ease'
+            }}
           >
             Filter by Date
           </Button>
-        </form>
-      </div>
+          
+          <Button
+            variant="outlined"
+            onClick={() => setFilter({})}
+            sx={{
+              borderColor: '#e0e0e0',
+              color: '#666666',
+              fontWeight: 'bold',
+              borderRadius: '8px',
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              '&:hover': {
+                borderColor: '#1976d2',
+                color: '#1976d2',
+                backgroundColor: '#f5f5f5'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Clear Filters
+          </Button>
+        </Box>
+      </Box>
 
       {/* Updates Table */}
-      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
-        <div className="inline-block min-w-full py-2 align-middle px-4 sm:px-6 lg:px-8">
-          <div className="shadow ring-1 ring-black ring-opacity-5 rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="bg-gray-50">
+      {updates.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '16px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}
+        >
+          <Typography variant="h6" sx={{ color: '#666666', fontWeight: 500 }}>
+            No updates found.
+          </Typography>
+        </Box>
+      ) : isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {updates.map((update) => (
+            <Card
+              key={update._id}
+              sx={{
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                border: '1px solid #e0e0e0',
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': { 
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                  borderColor: '#1976d2'
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: update.updateType === 'New Medication' ? 'linear-gradient(90deg, #43a047 0%, #66bb6a 100%)' :
+                    update.updateType === 'MedStock Increase' ? 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)' :
+                    update.updateType === 'MedStock Decrease' ? 'linear-gradient(90deg, #fbc02d 0%, #ffd54f 100%)' :
+                    update.updateType === 'Activated' ? 'linear-gradient(90deg, #43a047 0%, #66bb6a 100%)' :
+                    update.updateType === 'Deactivated' ? 'linear-gradient(90deg, #e53935 0%, #ef5350 100%)' : 'linear-gradient(90deg, #7e57c2 0%, #9575cd 100%)',
+                  zIndex: 1
+                }
+              }}
+            >
+              <CardContent sx={{ pb: 1, position: 'relative', zIndex: 2 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 1, 
+                    color: '#1a1a1a',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {update.medication.medicationName}
+                </Typography>
+                <Divider sx={{ my: 1 }} />
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>User:</span> {update.updatedBy?.username || update.updatedBy?.email || 'Unknown User'}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
+                    Type:
+                  </Typography>
+                  <Chip
+                    label={update.updateType}
+                    size="small"
+                    sx={{
+                      backgroundColor: getUpdateTypeColor(update.updateType).bg,
+                      color: getUpdateTypeColor(update.updateType).color,
+                      fontWeight: 'bold',
+                      fontSize: '0.75rem'
+                    }}
+                  />
+                </Box>
+                <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600, color: '#1a1a1a' }}>Changes:</Typography>
+                <Box sx={{
+                  background: '#f5f7fa',
+                  borderRadius: 2,
+                  padding: 2,
+                  marginBottom: 1,
+                  fontSize: '0.875rem',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  border: '1px solid #e0e0e0'
+                }}>
+                  {update.changes && typeof update.changes === 'object'
+                    ? Object.entries(update.changes).map(
+                        ([field, change]) => (
+                          <Box key={field} sx={{ marginBottom: 1 }}>
+                            <span style={{ fontWeight: 600, textTransform: 'capitalize', color: '#424242' }}>
+                              {field.replace(/([A-Z])/g, ' $1').trim()}:
+                            </span>{' '}
+                            <span style={{ color: '#e53935', fontWeight: 500 }}>
+                              {formatChangeValue(change.oldValue)}
+                            </span>
+                            {' → '}
+                            <span style={{ color: '#43a047', fontWeight: 500 }}>
+                              {formatChangeValue(change.newValue)}
+                            </span>
+                          </Box>
+                        )
+                      )
+                    : <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>{String(update.changes)}</Typography>}
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Notes:</span> {update.notes}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Timestamp:</span> {new Date(update.timestamp).toLocaleString()}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0, gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setSelectedUpdateId(update._id);
+                    setIsDeleteModalOpen(true);
+                  }}
+                  sx={{
+                    fontWeight: 'bold',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    borderWidth: 2,
+                    textTransform: 'none',
+                    borderColor: '#e53935',
+                    color: '#e53935',
+                    '&:hover': {
+                      background: '#ffebee',
+                      borderColor: '#b71c1c',
+                      color: '#b71c1c',
+                      transform: 'translateY(-1px)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                  startIcon={<FiTrash2 />}
+                >
+                  Delete
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            overflowX: 'auto', 
+            '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } },
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e0e0e0'
+          }}
+        >
+          <Box sx={{ overflowX: 'auto' }}>
+            <Box
+              component="table"
+              sx={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                '& th': {
+                  backgroundColor: '#f8f9fa',
+                  color: '#1a1a1a',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  padding: '12px 16px',
+                  textAlign: 'left',
+                  borderBottom: '1px solid #e0e0e0'
+                },
+                '& td': {
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #f0f0f0'
+                },
+                '& tr': {
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5',
+                    transition: 'background-color 0.2s ease'
+                  }
+                }
+              }}
+            >
+              <thead>
                 <tr>
-                  <th className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Medication
-                  </th>
-                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    User
-                  </th>
-                  <th className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Type
-                  </th>
-                  <th className="px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Changes
-                  </th>
-                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Notes
-                  </th>
-                  <th className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                    Timestamp
-                  </th>
-                  <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Actions</span>
-                  </th>
+                  <th>Medication</th>
+                  <th>User</th>
+                  <th>Type</th>
+                  <th>Changes</th>
+                  <th>Notes</th>
+                  <th>Timestamp</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
+              <tbody>
                 {updates.map((update) => (
                   <tr key={update._id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                      <div className="font-medium text-gray-900">
-                        {update.medication.medicationName}
-                      </div>
-                      <div className="sm:hidden text-xs text-gray-500 mt-1">
-                        {update.updatedBy?.username ||
-                          update.updatedBy?.email ||
-                          "Unknown User"}
-                      </div>
-                      <div className="sm:hidden text-xs text-gray-500">
-                        {new Date(update.timestamp).toLocaleString()}
-                      </div>
+                    <td sx={{ color: '#424242', fontWeight: 500 }}>
+                      {update.medication.medicationName}
                     </td>
-                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                    <td sx={{ color: '#666666' }}>
                       {update.updatedBy?.username ||
                         update.updatedBy?.email ||
                         "Unknown User"}
                     </td>
-                    <td className="px-3 py-4 text-sm">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getUpdateTypeColor(
-                          update.updateType
-                        )}`}
-                      >
-                        {update.updateType}
-                      </span>
+                    <td>
+                      <Chip
+                        label={update.updateType}
+                        size="small"
+                        sx={{
+                          backgroundColor: getUpdateTypeColor(update.updateType).bg,
+                          color: getUpdateTypeColor(update.updateType).color,
+                          fontWeight: 'bold',
+                          fontSize: '0.75rem'
+                        }}
+                      />
                     </td>
-                    <td className="px-3 py-4">
-                      <div className="max-w-xs text-sm">
+                    <td>
+                      <Box sx={{ maxWidth: '200px' }}>
                         {update.changes &&
                           Object.entries(update.changes).map(
                             ([field, change]) => (
-                              <div key={field} className="mb-1">
-                                <span className="font-medium capitalize">
+                              <Box key={field} sx={{ mb: 0.5 }}>
+                                <span style={{ fontWeight: 600, fontSize: '0.75rem', color: '#424242' }}>
                                   {field.replace(/([A-Z])/g, " $1").trim()}:
-                                </span>{" "}
-                                <span className="text-red-600">
+                                </span>{' '}
+                                <span style={{ color: '#e53935', fontSize: '0.75rem' }}>
                                   {formatChangeValue(change.oldValue)}
                                 </span>
                                 {" → "}
-                                <span className="text-green-600">
+                                <span style={{ color: '#43a047', fontSize: '0.75rem' }}>
                                   {formatChangeValue(change.newValue)}
                                 </span>
-                              </div>
+                              </Box>
                             )
                           )}
-                      </div>
+                      </Box>
                     </td>
-                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                    <td sx={{ color: '#666666', fontSize: '0.875rem' }}>
                       {update.updateType.includes("MedStock")
                         ? update.notes
                         : "N/A"}
                     </td>
-                    <td className="hidden sm:table-cell px-3 py-4 text-sm text-gray-500">
+                    <td sx={{ color: '#666666', fontSize: '0.875rem' }}>
                       {new Date(update.timestamp).toLocaleString()}
                     </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <button
+                    <td>
+                      <Button
                         onClick={() => {
                           setSelectedUpdateId(update._id);
                           setIsDeleteModalOpen(true);
                         }}
-                        className="text-red-600 hover:text-red-900"
+                        sx={{
+                          color: '#e53935',
+                          '&:hover': {
+                            backgroundColor: '#ffebee',
+                            color: '#b71c1c'
+                          }
+                        }}
                       >
-                        <FiTrash2 className="h-5 w-5" />
-                        <span className="sr-only">Delete update</span>
-                      </button>
+                        <FiTrash2 />
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
-        </div>
-      </TableContainer>
+            </Box>
+          </Box>
+        </TableContainer>
+      )}
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-              <div className="sm:flex sm:items-start">
-                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    Delete Update
-                  </h3>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this update? This action
-                      cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
-                <Button
-                  variant="contained"
-                  onClick={() => handleDelete(selectedUpdateId)}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              p: 4,
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              border: '1px solid #e0e0e0'
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, color: '#1a1a1a', fontWeight: 'bold' }}>
+              Delete Update
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: '#666666' }}>
+              Are you sure you want to delete this update? This action cannot be undone.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+              <Button
+                onClick={() => setIsDeleteModalOpen(false)}
+                sx={{
+                  color: '#666666',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleDelete(selectedUpdateId)}
+                variant="contained"
+                sx={{
+                  backgroundColor: '#e53935',
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: '#b71c1c'
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </Box>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

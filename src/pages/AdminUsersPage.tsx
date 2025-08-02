@@ -17,9 +17,19 @@ import {
   TablePagination,
   Button,
   Typography,
+  useMediaQuery,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+  Box,
+  Chip,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 
 const AdminUsersPage: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const token = localStorage.getItem("token");
 
   // Check for superAdmin access
@@ -73,136 +83,329 @@ const AdminUsersPage: React.FC = () => {
   if (error) return <div className="text-red-600">Error: {error}</div>;
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
-        <Typography sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 2, md: 3 },
+        maxWidth: "100%",
+        overflow: "hidden",
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
+      }}
+    >
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '16px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        <Typography 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.5rem' },
+            color: '#1a1a1a',
+            fontWeight: 'bold',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
           User Management
         </Typography>
-      </div>
+      </Box>
 
-      <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } } }}>
-        <Table className="min-w-full divide-y divide-gray-300">
-          <TableHead className="bg-gray-50">
-            <TableRow>
-              <TableCell className="py-3.5 pl-4 pr-3 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Email
-              </TableCell>
-              <TableCell className="hidden sm:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Role
-              </TableCell>
-              <TableCell className="hidden md:table-cell px-3 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-900">
-                Created At
-              </TableCell>
-              <TableCell className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                <span className="sr-only">Actions</span>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="divide-y divide-gray-200 bg-white">
-            {users.map((user) => (
-              <TableRow key={user._id}>
-                <TableCell className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                  <div className="font-medium text-gray-900">
-                    {user.email}
-                  </div>
-                  <div className="sm:hidden mt-1">
-                    <span
-                      className={`inline-flex px-2 py-1 rounded text-xs ${
-                        user.role === "admin"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="hidden sm:table-cell px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <span
-                    className={`px-2 py-1 rounded text-sm ${
-                      user.role === "admin"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell className="hidden md:table-cell px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </TableCell>
-                <TableCell className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                  <div className="flex justify-end gap-2">
-                    <Link
-                      to={`/admin/users/edit/${user._id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      <EditIcon className="h-5 w-5" />
-                      <span className="sr-only">Edit</span>
-                    </Link>
-                    <Button
-                      onClick={() => {
-                        setSelectedUserId(user._id);
-                        setIsDeleteModalOpen(true);
-                      }}
-                      className="text-red-600 hover:text-red-900"
-                      disabled={user.role === "admin"}
-                      sx={{ width: { xs: '100%', sm: 'auto' } }}
-                    >
-                      <FiTrash2 className="h-5 w-5" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-              <div className="sm:flex sm:items-start">
-                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    Delete User
-                  </h3>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this user? This action
-                      cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
+      {isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {users.map((user) => (
+            <Card
+              key={user._id}
+              sx={{
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                border: '1px solid #e0e0e0',
+                borderRadius: '16px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+                '&:hover': { 
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                  borderColor: '#1976d2'
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: user.role === 'admin' 
+                    ? 'linear-gradient(90deg, #7e57c2 0%, #9575cd 100%)'
+                    : 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+                  zIndex: 1
+                }
+              }}
+            >
+              <CardContent sx={{ pb: 1, position: 'relative', zIndex: 2 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 1, 
+                    color: '#1a1a1a',
+                    fontWeight: 'bold',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {user.email}
+                </Typography>
+                <Divider sx={{ my: 1 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
+                    Role:
+                  </Typography>
+                  <Chip
+                    label={user.role}
+                    size="small"
+                    sx={{
+                      backgroundColor: user.role === 'admin' ? '#f3e5f5' : '#e3f2fd',
+                      color: user.role === 'admin' ? '#7e57c2' : '#1976d2',
+                      fontWeight: 'bold',
+                      fontSize: '0.75rem'
+                    }}
+                  />
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Created:</span> {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0, gap: 1 }}>
                 <Button
-                  type="button"
-                  onClick={() => handleDelete(selectedUserId)}
-                  className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                  variant="contained"
+                  component={Link}
+                  to={`/admin/users/edit/${user._id}`}
+                  sx={{
+                    fontWeight: 'bold',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    boxShadow: 1,
+                    textTransform: 'none',
+                    background: 'linear-gradient(90deg, #1976d2 60%, #1565c0 100%)',
+                    color: '#ffffff',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #1565c0 60%, #1976d2 100%)',
+                      boxShadow: 2,
+                      transform: 'translateY(-1px)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                  startIcon={<EditIcon />}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setSelectedUserId(user._id);
+                    setIsDeleteModalOpen(true);
+                  }}
+                  disabled={user.role === "admin"}
+                  sx={{
+                    fontWeight: 'bold',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 2,
+                    borderWidth: 2,
+                    textTransform: 'none',
+                    borderColor: '#e53935',
+                    color: '#e53935',
+                    '&:hover': {
+                      background: '#ffebee',
+                      borderColor: '#b71c1c',
+                      color: '#b71c1c',
+                      transform: 'translateY(-1px)'
+                    },
+                    '&:disabled': {
+                      borderColor: '#ccc',
+                      color: '#ccc'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                  startIcon={<FiTrash2 />}
                 >
                   Delete
                 </Button>
-                <Button
-                  type="button"
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            overflowX: 'auto', 
+            '& .MuiTable-root': { minWidth: { xs: 500, sm: 800 } },
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e0e0e0'
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#f8f9fa' }}>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Email
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Role
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Created At
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow 
+                  key={user._id}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      transition: 'background-color 0.2s ease'
+                    }
+                  }}
                 >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+                  <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
+                    {user.email}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.role}
+                      size="small"
+                      sx={{
+                        backgroundColor: user.role === 'admin' ? '#f3e5f5' : '#e3f2fd',
+                        color: user.role === 'admin' ? '#7e57c2' : '#1976d2',
+                        fontWeight: 'bold',
+                        fontSize: '0.75rem'
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ color: '#666666' }}>
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                      <Button
+                        component={Link}
+                        to={`/admin/users/edit/${user._id}`}
+                        sx={{
+                          color: '#1976d2',
+                          '&:hover': {
+                            backgroundColor: '#e3f2fd',
+                            color: '#1565c0'
+                          }
+                        }}
+                      >
+                        <EditIcon />
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setSelectedUserId(user._id);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        disabled={user.role === "admin"}
+                        sx={{
+                          color: '#e53935',
+                          '&:hover': {
+                            backgroundColor: '#ffebee',
+                            color: '#b71c1c'
+                          },
+                          '&:disabled': {
+                            color: '#ccc'
+                          }
+                        }}
+                      >
+                        <FiTrash2 />
+                      </Button>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              p: 4,
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              border: '1px solid #e0e0e0'
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2, color: '#1a1a1a', fontWeight: 'bold' }}>
+              Delete User
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: '#666666' }}>
+              Are you sure you want to delete this user? This action cannot be undone.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+              <Button
+                onClick={() => setIsDeleteModalOpen(false)}
+                sx={{
+                  color: '#666666',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleDelete(selectedUserId)}
+                variant="contained"
+                sx={{
+                  backgroundColor: '#e53935',
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: '#b71c1c'
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 };
 

@@ -1,0 +1,36 @@
+/* Navigation Styles with High Specificity */
+.navigation-bar {
+  background-color: #1976d2 !important;
+  color: white !important;
+}
+
+.nav-brand {
+  color: white !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+  font-size: 20px !important;
+}
+
+.nav-link {
+  color: white !important;
+  font-weight: bold !important;
+  text-decoration: none !important;
+}
+
+.nav-admin {
+  background-color: #1565c0 !important;
+  border: none !important;
+}
+
+/* Override any Tailwind or Material-UI styles */
+.navigation-bar * {
+  color: white !important;
+}
+
+.nav-brand:hover {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: white !important;
+} 
