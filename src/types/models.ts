@@ -139,6 +139,57 @@ export interface Group {
   updatedBy?: string;
 }
 
+export interface Summary {
+  _id: string;
+  startDate: string;
+  endDate: string;
+  summaries: {
+    serviceUser: {
+      _id: string;
+      name: string;
+      dateOfBirth: string;
+      nhsNumber: string;
+    };
+    medication: {
+      _id: string;
+      medicationName: string;
+      quantityInStock: number;
+      quantityPerDose: number;
+      dosesPerDay: number;
+    };
+    stockLevels: {
+      initial: number;
+      final: number;
+      daysRemaining: number;
+    };
+    cumulativeChanges: {
+      fromPharmacy: number;
+      quantityAdministered: number;
+      leavingHome: number;
+      returningHome: number;
+      returnedToPharmacy: number;
+      lost: number;
+      damaged: number;
+      other: number;
+    };
+    changes: {
+      type: string;
+      quantity: number;
+      note: string;
+      timestamp: string;
+      updatedBy: {
+        _id: string;
+        username: string;
+        email: string;
+      };
+      _id: string;
+    }[];
+    _id: string;
+  }[];
+  createdAt: string;
+  __v: number;
+}
+
 export interface WeeklySummary {
   _id: string;
   startDate: string;
@@ -190,36 +241,3 @@ export interface WeeklySummary {
   __v: number;
 }
 
-// export type CareHome = {
-//   _id: string;
-//   name: string;
-//   location: string;
-//   manager: string;
-// };
-
-// export type Employee = {
-//   _id: string;
-//   name: string;
-//   email: string;
-//   phone: string;
-//   role: string;
-//   care_home_id: string;
-//   availability: string[];
-// };
-
-// export type Shift = {
-//   _id: string;
-//   care_home_id: string;
-//   employee_id: string;
-//   employee_name: string;
-//   date: string;
-//   start_time: string;
-//   end_time: string;
-// };
-
-// export type Rota = {
-//   _id: string;
-//   care_home_id: string;
-//   week_start: string;
-//   shifts: Shift[];
-// };

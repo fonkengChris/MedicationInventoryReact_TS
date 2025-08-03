@@ -48,10 +48,17 @@ const AdminWeeklySummariesPage = () => {
     onSuccess: async (response) => {
       console.log("Generation response:", response);
       setGeneratedSummary(response.data);
+      // Convert string dates to Date objects safely
       const generatedStartDate = new Date(response.data.startDate);
       const generatedEndDate = new Date(response.data.endDate);
-      setStartDate(generatedStartDate);
-      setEndDate(generatedEndDate);
+      
+      // Validate that the dates are valid before setting them
+      if (!isNaN(generatedStartDate.getTime()) && !isNaN(generatedEndDate.getTime())) {
+        setStartDate(generatedStartDate);
+        setEndDate(generatedEndDate);
+      } else {
+        console.error("Invalid dates received from API:", response.data.startDate, response.data.endDate);
+      }
     },
   });
 
@@ -62,8 +69,8 @@ const AdminWeeklySummariesPage = () => {
   } = useQuery<WeeklySummary>({
     queryKey: [
       "weeklySummaries",
-      startDate?.toISOString(),
-      endDate?.toISOString(),
+      startDate instanceof Date ? startDate.toISOString() : startDate,
+      endDate instanceof Date ? endDate.toISOString() : endDate,
     ],
     queryFn: async () => {
       if (!startDate || !endDate) {
@@ -76,7 +83,7 @@ const AdminWeeklySummariesPage = () => {
         startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
       });
-      return response.data;
+      return response.data.data;
     },
     enabled: !!startDate && !!endDate,
   });
@@ -267,9 +274,12 @@ const AdminWeeklySummariesPage = () => {
         >
           <CircularProgress size={48} sx={{ color: '#1976d2' }} />
         </Box>
-      ) : generatedSummary || summary ? (
+      ) : (() => {
+        const currentSummary = generatedSummary || summary;
+        return currentSummary?.summaries && currentSummary.summaries.length > 0;
+      })() ? (
         <Box sx={{ mt: 4 }}>
-          {(generatedSummary || summary)?.summaries.map((med) => (
+          {(generatedSummary || summary)?.summaries?.map((med) => (
             <Card
               key={med._id}
               sx={{

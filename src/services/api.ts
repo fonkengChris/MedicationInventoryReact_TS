@@ -132,7 +132,7 @@ export const groupApi = {
 export const weeklySummariesApi = {
   getAll: async (params?: { startDate?: string; endDate?: string }) => {
     console.log("Fetching weekly summaries with params:", params);
-    const response = await api.get<WeeklySummary>("/summaries/date-range", {
+    const response = await api.get<{ success: boolean; data: WeeklySummary; message?: string }>("/summaries/date-range", {
       params,
     });
     console.log("Weekly summaries response:", response.data);
@@ -140,7 +140,7 @@ export const weeklySummariesApi = {
   },
   generate: async (params: { startDate: string; endDate: string }) => {
     console.log("Generating weekly summary");
-    const response = await api.post<WeeklySummary>(
+    const response = await api.post<{ success: boolean; data: WeeklySummary; message?: string }>(
       "/summaries/generate",
       params
     );
