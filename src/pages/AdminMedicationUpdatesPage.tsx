@@ -23,6 +23,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Alert,
 } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { Card, CardContent, CardActions, Divider, useMediaQuery } from '@mui/material';
@@ -42,6 +43,14 @@ const AdminMedicationUpdatesPage: React.FC = () => {
     userId?: string;
     dateRange?: DateRangeFilter;
   }>({});
+  const [dateInputs, setDateInputs] = useState<{
+    startDate: string;
+    endDate: string;
+  }>({
+    startDate: "",
+    endDate: "",
+  });
+  const [dateError, setDateError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUpdateId, setSelectedUpdateId] = useState<string>("");
 
@@ -65,21 +74,19 @@ const AdminMedicationUpdatesPage: React.FC = () => {
   const fetchUpdates = async () => {
     try {
       setIsLoading(true);
-      let response;
-
-      if (filter.medicationId) {
-        response = await medicationUpdateApi.getByMedication(
-          filter.medicationId
-        );
-      } else if (filter.userId) {
-        response = await medicationUpdateApi.getByUser(filter.userId);
-      } else if (filter.dateRange) {
-        response = await medicationUpdateApi.getByDateRange(filter.dateRange);
+      
+      // Check if we have any filters
+      const hasFilters = filter.medicationId || filter.userId || filter.dateRange;
+      
+      if (hasFilters) {
+        // Use the new filtered endpoint that can handle multiple filters
+        const response = await medicationUpdateApi.getFiltered(filter);
+        setUpdates(response.data);
       } else {
-        response = await medicationUpdateApi.getAll();
+        // No filters, get all updates
+        const response = await medicationUpdateApi.getAll();
+        setUpdates(response.data);
       }
-
-      setUpdates(response.data);
     } catch (error) {
       console.error("Error fetching updates:", error);
       setError(
@@ -94,15 +101,54 @@ const AdminMedicationUpdatesPage: React.FC = () => {
     fetchUpdates();
   }, [filter]);
 
-  const handleDateRangeFilter = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    setFilter({
-      dateRange: {
-        startDate: formData.get("startDate") as string,
-        endDate: formData.get("endDate") as string,
-      },
-    });
+  const validateDateRange = (startDate: string, endDate: string): string | null => {
+    if (!startDate && !endDate) {
+      return null; // Both empty is valid (no date filter)
+    }
+    
+    if (!startDate || !endDate) {
+      return "Both start and end dates are required";
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return "Invalid date format";
+    }
+    
+    if (start > end) {
+      return "Start date must be before or equal to end date";
+    }
+    
+    return null;
+  };
+
+  const handleDateRangeFilter = () => {
+    const validationError = validateDateRange(dateInputs.startDate, dateInputs.endDate);
+    setDateError(validationError);
+    
+    if (validationError) {
+      return;
+    }
+
+    // Update filter while preserving other filters
+    setFilter(prevFilter => ({
+      ...prevFilter,
+      dateRange: dateInputs.startDate && dateInputs.endDate ? {
+        startDate: dateInputs.startDate,
+        endDate: dateInputs.endDate,
+      } : undefined,
+    }));
+  };
+
+  const handleClearDateFilter = () => {
+    setDateInputs({ startDate: "", endDate: "" });
+    setDateError(null);
+    setFilter(prevFilter => ({
+      ...prevFilter,
+      dateRange: undefined,
+    }));
   };
 
   const handleDelete = async (id: string) => {
@@ -198,7 +244,10 @@ const AdminMedicationUpdatesPage: React.FC = () => {
             <Select
               value={filter.medicationId || ""}
               onChange={(e) =>
-                setFilter({ medicationId: e.target.value || undefined })
+                setFilter(prev => ({ 
+                  ...prev, 
+                  medicationId: e.target.value || undefined 
+                }))
               }
               sx={{
                 '& .MuiOutlinedInput-notchedOutline': {
@@ -210,6 +259,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               }}
             >
               <MenuItem value="">All Medications</MenuItem>
+              <MenuItem value="null">Unknown/Deleted Medications</MenuItem>
               {activeMedications.map((med) => (
                 <MenuItem key={med._id} value={med._id}>
                   {med.medicationName}
@@ -222,7 +272,10 @@ const AdminMedicationUpdatesPage: React.FC = () => {
             <InputLabel sx={{ color: '#666666' }}>All Users</InputLabel>
             <Select
               value={filter.userId || ""}
-              onChange={(e) => setFilter({ userId: e.target.value || undefined })}
+              onChange={(e) => setFilter(prev => ({ 
+                ...prev, 
+                userId: e.target.value || undefined 
+              }))}
               sx={{
                 '& .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#e0e0e0'
@@ -233,6 +286,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               }}
             >
               <MenuItem value="">All Users</MenuItem>
+              <MenuItem value="null">Unknown/Deleted Users</MenuItem>
               {users.map((user) => (
                 <MenuItem key={user._id} value={user._id}>
                   {user?.username || user?.email || "Unknown User"}
@@ -244,8 +298,10 @@ const AdminMedicationUpdatesPage: React.FC = () => {
           <TextField
             type="date"
             label="Start Date"
-            name="startDate"
+            value={dateInputs.startDate}
+            onChange={(e) => setDateInputs(prev => ({ ...prev, startDate: e.target.value }))}
             fullWidth
+            InputLabelProps={{ shrink: true }}
             sx={{
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#e0e0e0'
@@ -259,8 +315,10 @@ const AdminMedicationUpdatesPage: React.FC = () => {
           <TextField
             type="date"
             label="End Date"
-            name="endDate"
+            value={dateInputs.endDate}
+            onChange={(e) => setDateInputs(prev => ({ ...prev, endDate: e.target.value }))}
             fullWidth
+            InputLabelProps={{ shrink: true }}
             sx={{
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#e0e0e0'
@@ -271,16 +329,19 @@ const AdminMedicationUpdatesPage: React.FC = () => {
             }}
           />
         </Box>
+
+        {/* Date Error Alert */}
+        {dateError && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {dateError}
+          </Alert>
+        )}
         
-        <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+        <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Button
             variant="contained"
-            onClick={() => {
-              const form = document.querySelector('form');
-              if (form) {
-                handleDateRangeFilter(form as HTMLFormElement);
-              }
-            }}
+            onClick={handleDateRangeFilter}
+            disabled={!dateInputs.startDate || !dateInputs.endDate}
             sx={{
               background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
               color: '#ffffff',
@@ -295,15 +356,49 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
                 transform: 'translateY(-1px)'
               },
+              '&:disabled': {
+                background: '#e0e0e0',
+                color: '#999999',
+                boxShadow: 'none',
+                transform: 'none'
+              },
               transition: 'all 0.2s ease'
             }}
           >
             Filter by Date
           </Button>
+
+          {(dateInputs.startDate || dateInputs.endDate) && (
+            <Button
+              variant="outlined"
+              onClick={handleClearDateFilter}
+              sx={{
+                borderColor: '#e0e0e0',
+                color: '#666666',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                px: 3,
+                py: 1.5,
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  backgroundColor: '#f5f5f5'
+                },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Clear Date Filter
+            </Button>
+          )}
           
           <Button
             variant="outlined"
-            onClick={() => setFilter({})}
+            onClick={() => {
+              setFilter({});
+              setDateInputs({ startDate: "", endDate: "" });
+              setDateError(null);
+            }}
             sx={{
               borderColor: '#e0e0e0',
               color: '#666666',
@@ -320,7 +415,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               transition: 'all 0.2s ease'
             }}
           >
-            Clear Filters
+            Clear All Filters
           </Button>
         </Box>
       </Box>
@@ -526,10 +621,10 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               <tbody>
                 {updates.map((update) => (
                   <tr key={update._id}>
-                    <td sx={{ color: '#424242', fontWeight: 500 }}>
+                    <td style={{ color: '#424242', fontWeight: 500 }}>
                       {update.medication.medicationName}
                     </td>
-                    <td sx={{ color: '#666666' }}>
+                    <td style={{ color: '#666666' }}>
                       {update.updatedBy?.username ||
                         update.updatedBy?.email ||
                         "Unknown User"}
@@ -567,12 +662,12 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                           )}
                       </Box>
                     </td>
-                    <td sx={{ color: '#666666', fontSize: '0.875rem' }}>
+                    <td style={{ color: '#666666', fontSize: '0.875rem' }}>
                       {update.updateType.includes("MedStock")
                         ? update.notes
                         : "N/A"}
                     </td>
-                    <td sx={{ color: '#666666', fontSize: '0.875rem' }}>
+                    <td style={{ color: '#666666', fontSize: '0.875rem' }}>
                       {new Date(update.timestamp).toLocaleString()}
                     </td>
                     <td>

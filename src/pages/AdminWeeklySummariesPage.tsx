@@ -47,17 +47,17 @@ const AdminWeeklySummariesPage = () => {
     },
     onSuccess: async (response) => {
       console.log("Generation response:", response);
-      setGeneratedSummary(response.data);
+      setGeneratedSummary(response.data.data);
       // Convert string dates to Date objects safely
-      const generatedStartDate = new Date(response.data.startDate);
-      const generatedEndDate = new Date(response.data.endDate);
+      const generatedStartDate = new Date(response.data.data.startDate);
+      const generatedEndDate = new Date(response.data.data.endDate);
       
       // Validate that the dates are valid before setting them
       if (!isNaN(generatedStartDate.getTime()) && !isNaN(generatedEndDate.getTime())) {
         setStartDate(generatedStartDate);
         setEndDate(generatedEndDate);
       } else {
-        console.error("Invalid dates received from API:", response.data.startDate, response.data.endDate);
+        console.error("Invalid dates received from API:", response.data.data.startDate, response.data.data.endDate);
       }
     },
   });
@@ -179,6 +179,7 @@ const AdminWeeklySummariesPage = () => {
               slotProps={{ 
                 textField: { 
                   fullWidth: true,
+                  InputLabelProps: { shrink: true },
                   sx: {
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#e0e0e0'
@@ -197,6 +198,7 @@ const AdminWeeklySummariesPage = () => {
               slotProps={{ 
                 textField: { 
                   fullWidth: true,
+                  InputLabelProps: { shrink: true },
                   sx: {
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#e0e0e0'

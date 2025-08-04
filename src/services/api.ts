@@ -93,6 +93,20 @@ export const medicationUpdateApi = {
     api.get<MedicationUpdate[]>(`/updates/user/${userId}`),
   getByDateRange: (filter: DateRangeFilter) =>
     api.get<MedicationUpdate[]>("/updates/date-range", { params: filter }),
+  getFiltered: (filters: {
+    medicationId?: string;
+    userId?: string;
+    dateRange?: DateRangeFilter;
+  }) => {
+    const params: any = {};
+    if (filters.medicationId) params.medicationId = filters.medicationId;
+    if (filters.userId) params.userId = filters.userId;
+    if (filters.dateRange) {
+      params.startDate = filters.dateRange.startDate;
+      params.endDate = filters.dateRange.endDate;
+    }
+    return api.get<MedicationUpdate[]>("/updates/filtered", { params });
+  },
   delete: (id: string) => api.delete(`/updates/${id}`),
   create: (update: Omit<MedicationUpdate, "_id">) =>
     api.post<MedicationUpdate>("/updates", update),
