@@ -183,7 +183,7 @@ const Home = () => {
     }
   };
 
-  const handleServeMedication = (medication: ActiveMedication) => {
+  const handleDispenseMedication = (medication: ActiveMedication) => {
     setSelectedMedication(medication);
     setIsServing(true);
     setNotes("");
@@ -191,7 +191,7 @@ const Home = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitServe = async () => {
+  const handleSubmitDispense = async () => {
     if (!selectedMedication) return;
 
     try {
@@ -205,7 +205,7 @@ const Home = () => {
       setQuantity(0);
       setNotes("");
     } catch (error) {
-      console.error("Failed to serve medication:", error);
+      console.error("Failed to dispense medication:", error);
     }
   };
 
@@ -551,10 +551,10 @@ const Home = () => {
                           <AddIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Serve Medication">
+                      <Tooltip title="Dispense Medication">
                         <IconButton
                           color="success"
-                          onClick={() => handleServeMedication(medication)}
+                          onClick={() => handleDispenseMedication(medication)}
                         >
                           <LocalHospitalIcon />
                         </IconButton>
@@ -690,7 +690,7 @@ const Home = () => {
           <TextField
             fullWidth
             type="number"
-            label={isServing ? "Quantity to Serve" : "Quantity to Add"}
+            label={isServing ? "Quantity to Dispense" : "Quantity to Add"}
             value={quantity}
             onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
             inputProps={{ min: 0 }}
@@ -718,7 +718,7 @@ const Home = () => {
           </FormControl>
           <Button
             variant="contained"
-            onClick={isServing ? handleSubmitServe : handleSubmitStock}
+            onClick={isServing ? handleSubmitDispense : handleSubmitStock}
             sx={{ 
               mr: 1,
               backgroundColor: '#1976d2',
@@ -730,7 +730,7 @@ const Home = () => {
               }
             }}
           >
-            {isServing ? "Serve" : "Add Stock"}
+            {isServing ? "Dispense" : "Add Stock"}
           </Button>
           <Button 
             onClick={() => setIsModalOpen(false)}
