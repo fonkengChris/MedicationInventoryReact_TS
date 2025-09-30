@@ -105,13 +105,15 @@ const Home = () => {
       const userGroupIds: string[] = [];
 
       if (Array.isArray((currentUser as unknown as User).groups)) {
-        (currentUser as unknown as User).groups!.forEach((group) => {
-          if (typeof group === "string") {
-            userGroupIds.push(group);
-          } else if (group && typeof group === "object" && "_id" in group && group._id) {
-            userGroupIds.push(group._id);
-          }
-        });
+        (currentUser as unknown as User).groups!
+          .filter((group) => group != null) // Filter out null/undefined groups
+          .forEach((group) => {
+            if (typeof group === "string") {
+              userGroupIds.push(group);
+            } else if (group && typeof group === "object" && "_id" in group && group._id) {
+              userGroupIds.push(group._id);
+            }
+          });
       }
 
       const filtered = serviceUsers.filter((serviceUser) => {
