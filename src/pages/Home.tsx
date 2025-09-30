@@ -108,7 +108,7 @@ const Home = () => {
         (currentUser as unknown as User).groups!.forEach((group) => {
           if (typeof group === "string") {
             userGroupIds.push(group);
-          } else if (group && typeof group === "object" && "_id" in group) {
+          } else if (group && typeof group === "object" && "_id" in group && group._id) {
             userGroupIds.push(group._id);
           }
         });
