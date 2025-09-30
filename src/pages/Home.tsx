@@ -162,11 +162,23 @@ const Home = () => {
   }, [serviceUsers, currentUser]);
 
   const filteredMedications = activeMedications.filter(
-    (med) => (med.serviceUser as any)._id === selectedUser && med.isActive
+    (med) => {
+      if (!med || !med.serviceUser) return false;
+      const serviceUserId = typeof med.serviceUser === 'string' 
+        ? med.serviceUser 
+        : (med.serviceUser as any)?._id;
+      return serviceUserId === selectedUser && med.isActive;
+    }
   );
 
   const filteredAppointments = appointments.filter(
-    (apt) => (apt.serviceUser as any)._id === selectedUser
+    (apt) => {
+      if (!apt || !apt.serviceUser) return false;
+      const serviceUserId = typeof apt.serviceUser === 'string'
+        ? apt.serviceUser
+        : (apt.serviceUser as any)?._id;
+      return serviceUserId === selectedUser;
+    }
   );
 
   const handleUserChange = (event: any) => {
