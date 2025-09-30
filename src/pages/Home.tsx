@@ -82,6 +82,11 @@ const Home = () => {
 
   // Filter service users based on user's role and group
   const filteredServiceUsers = React.useMemo(() => {
+    // Return empty array if no service users
+    if (!serviceUsers || serviceUsers.length === 0) {
+      return [];
+    }
+
     const token = localStorage.getItem("token");
     if (!token) return [];
 
@@ -96,56 +101,64 @@ const Home = () => {
 
     // If user is admin or superAdmin, show all service users
     if (isAdmin) {
-      return serviceUsers;
+      return serviceUsers || [];
     }
 
     // For regular users, only show service users from their groups
-    if (currentUser && (currentUser as unknown as User).groups && serviceUsers.length > 0) {
-      // Extract user group IDs - handle both string and object formats
-      const userGroupIds: string[] = [];
-
-      if (Array.isArray((currentUser as unknown as User).groups)) {
-        (currentUser as unknown as User).groups!
-          .filter((group) => group != null) // Filter out null/undefined groups
-          .forEach((group) => {
-            if (typeof group === "string") {
-              userGroupIds.push(group);
-            } else if (group && typeof group === "object" && "_id" in group && group._id) {
-              userGroupIds.push(group._id);
-            }
-          });
-      }
-
-      const filtered = serviceUsers.filter((serviceUser) => {
-        // Extract service user group ID
-        let serviceUserGroupId: string | null = null;
-        if (typeof serviceUser.group === "string") {
-          serviceUserGroupId = serviceUser.group;
-        } else if (
-          serviceUser.group &&
-          typeof serviceUser.group === "object" &&
-          "_id" in serviceUser.group &&
-          serviceUser.group._id
-        ) {
-          serviceUserGroupId = serviceUser.group._id;
-        }
-
-        if (!serviceUserGroupId) {
-          return false;
-        }
-
-        // Check if the service user's group ID matches any of the user's group IDs
-        const isInGroup = userGroupIds.some((userGroupId) => {
-          return userGroupId === serviceUserGroupId;
-        });
-
-        return isInGroup;
-      });
-
-      return filtered;
+    if (!currentUser || !(currentUser as unknown as User).groups) {
+      return [];
     }
 
-    return [];
+    // Extract user group IDs - handle both string and object formats
+    const userGroupIds: string[] = [];
+
+    if (Array.isArray((currentUser as unknown as User).groups)) {
+      (currentUser as unknown as User).groups!
+        .filter((group) => group != null) // Filter out null/undefined groups
+        .forEach((group) => {
+          if (typeof group === "string") {
+            userGroupIds.push(group);
+          } else if (group && typeof group === "object" && "_id" in group && group._id) {
+            userGroupIds.push(group._id);
+          }
+        });
+    }
+
+    // If no valid group IDs found, return empty array
+    if (userGroupIds.length === 0) {
+      return [];
+    }
+
+    const filtered = serviceUsers.filter((serviceUser) => {
+      // Skip if service user is null/undefined
+      if (!serviceUser) return false;
+
+      // Extract service user group ID
+      let serviceUserGroupId: string | null = null;
+      if (typeof serviceUser.group === "string") {
+        serviceUserGroupId = serviceUser.group;
+      } else if (
+        serviceUser.group &&
+        typeof serviceUser.group === "object" &&
+        "_id" in serviceUser.group &&
+        serviceUser.group._id
+      ) {
+        serviceUserGroupId = serviceUser.group._id;
+      }
+
+      if (!serviceUserGroupId) {
+        return false;
+      }
+
+      // Check if the service user's group ID matches any of the user's group IDs
+      const isInGroup = userGroupIds.some((userGroupId) => {
+        return userGroupId === serviceUserGroupId;
+      });
+
+      return isInGroup;
+    });
+
+    return filtered;
   }, [serviceUsers, currentUser]);
 
   const filteredMedications = activeMedications.filter(
