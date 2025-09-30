@@ -11,7 +11,7 @@ import {
   WeeklySummary,
 } from "../types/models";
 
-const API_BASE_URL = "http://localhost:5000/api"; // Make sure this matches your backend URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

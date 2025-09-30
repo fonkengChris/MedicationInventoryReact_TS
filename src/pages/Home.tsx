@@ -100,12 +100,12 @@ const Home = () => {
     }
 
     // For regular users, only show service users from their groups
-    if (currentUser && currentUser.groups && serviceUsers.length > 0) {
+    if (currentUser && (currentUser as unknown as User).groups && serviceUsers.length > 0) {
       // Extract user group IDs - handle both string and object formats
       const userGroupIds: string[] = [];
 
-      if (Array.isArray(currentUser.groups)) {
-        currentUser.groups.forEach((group) => {
+      if (Array.isArray((currentUser as unknown as User).groups)) {
+        (currentUser as unknown as User).groups!.forEach((group) => {
           if (typeof group === "string") {
             userGroupIds.push(group);
           } else if (group && typeof group === "object" && "_id" in group) {
@@ -290,7 +290,7 @@ const Home = () => {
               const decodedToken = jwtDecode<{ role: string }>(token);
               if (
                 !["admin", "superAdmin"].includes(decodedToken.role) &&
-                currentUser?.groups
+(currentUser as unknown as User)?.groups
               ) {
                 return (
                   <Box sx={{ mb: 2 }}>
@@ -299,8 +299,8 @@ const Home = () => {
                       sx={{ mb: 1, color: '#424242', fontWeight: 500 }}
                     >
                       You have access to service users in your assigned groups:{" "}
-                      {Array.isArray(currentUser.groups)
-                        ? currentUser.groups
+                      {Array.isArray((currentUser as unknown as User).groups)
+                        ? (currentUser as unknown as User).groups!
                             .map((group) =>
                               typeof group === "string" ? group : group.name
                             )

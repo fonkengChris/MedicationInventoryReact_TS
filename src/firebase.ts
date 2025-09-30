@@ -4,16 +4,13 @@ import { getMessaging, getToken } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDHN21a_r1Ho_xnTibzRIyBxlyI9-vbGDM",
-  authDomain:
-    process.env.NODE_ENV === "development"
-      ? "localhost"
-      : "medication-inventory-bf350.firebaseapp.com",
-  projectId: "medication-inventory-bf350",
-  storageBucket: "medication-inventory-bf350.firebasestorage.app",
-  messagingSenderId: "857385696434",
-  appId: "1:857385696434:web:0b911595c3ee8173899dab",
-  measurementId: "G-6DV3XMM8GJ",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
