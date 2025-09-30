@@ -23,13 +23,15 @@ const useServiceUsers = () => {
       } catch (error) {
         console.error("Error fetching service users:", error);
         // Use initial data as fallback
-        const fallbackData = initialServiceUsers.map((user) => ({
-          ...user,
-          _id: user._id.$oid,
-          dateOfBirth: user.dateOfBirth.$date,
-          createdAt: new Date(user.createdAt.$date),
-          group: user.group?.$oid || undefined,
-        })) as ServiceUser[];
+        const fallbackData = initialServiceUsers
+          .filter((user) => user.group?.$oid) // Only include users with valid groups
+          .map((user) => ({
+            ...user,
+            _id: user._id.$oid,
+            dateOfBirth: user.dateOfBirth.$date,
+            createdAt: new Date(user.createdAt.$date),
+            group: user.group?.$oid || undefined,
+          })) as ServiceUser[];
         console.log(
           "Using initial data:",
           fallbackData.map((su) => ({
@@ -41,13 +43,15 @@ const useServiceUsers = () => {
         return fallbackData;
       }
     },
-    initialData: initialServiceUsers.map((user) => ({
-      ...user,
-      _id: user._id.$oid,
-      dateOfBirth: user.dateOfBirth.$date,
-      createdAt: new Date(user.createdAt.$date),
-      group: user.group?.$oid || undefined,
-    })) as ServiceUser[],
+    initialData: initialServiceUsers
+      .filter((user) => user.group?.$oid) // Only include users with valid groups
+      .map((user) => ({
+        ...user,
+        _id: user._id.$oid,
+        dateOfBirth: user.dateOfBirth.$date,
+        createdAt: new Date(user.createdAt.$date),
+        group: user.group?.$oid || undefined,
+      })) as ServiceUser[],
     staleTime: 0, // Always fetch fresh data
     refetchOnMount: true,
   });
