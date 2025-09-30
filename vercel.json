@@ -15,6 +15,13 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/firebase-messaging-sw.js",
+      "dest": "/firebase-messaging-sw.js",
+      "headers": {
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
