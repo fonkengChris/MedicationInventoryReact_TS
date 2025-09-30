@@ -122,7 +122,8 @@ const Home = () => {
         } else if (
           serviceUser.group &&
           typeof serviceUser.group === "object" &&
-          "_id" in serviceUser.group
+          "_id" in serviceUser.group &&
+          serviceUser.group._id
         ) {
           serviceUserGroupId = serviceUser.group._id;
         }
