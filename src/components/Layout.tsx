@@ -102,6 +102,25 @@ const Layout: React.FC = () => {
                 >
                   Medications
                 </Link>
+                <Link 
+                  to="/administration" 
+                  style={{ 
+                    color: '#ffffff',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Administration
+                </Link>
                 {isAdmin() && (
                   <Link 
                     to="/admin" 
@@ -193,6 +212,21 @@ const Layout: React.FC = () => {
                   }}
                 >
                   Medications
+                </MenuItem>
+                <MenuItem
+                  onClick={handleMenuClose}
+                  component={Link}
+                  to="/administration"
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#1a1a1a',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                      color: '#1a1a1a'
+                    }
+                  }}
+                >
+                  Administration
                 </MenuItem>
                 {isAdmin() && (
                   <MenuItem

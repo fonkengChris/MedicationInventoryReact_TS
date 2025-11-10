@@ -1,16 +1,6 @@
-import React, { useEffect, useState } from "react";
-import {
-  serviceUserApi,
-  activeMedicationApi,
-  appointmentApi,
-} from "../services/api";
-import {
-  ServiceUser,
-  ActiveMedication,
-  Appointment,
-  User,
-  Group,
-} from "../types/models";
+import React, { useState } from "react";
+import { appointmentApi } from "../services/api";
+import { Appointment, User } from "../types/models";
 import {
   FormControl,
   InputLabel,
@@ -25,8 +15,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
-  Tooltip,
   Modal,
   TextField,
   Button,
@@ -37,23 +25,16 @@ import {
   Stack,
   Alert,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import PersonIcon from "@mui/icons-material/Person";
 import { jwtDecode } from "jwt-decode";
 import useServiceUsers from "../hooks/useServiceUsers";
 import useActiveMedications from "../hooks/useActiveMedications";
 import useAppointments from "../hooks/useAppointments";
 import useCurrentUser from "../hooks/useCurrentUser";
-import { SelectChangeEvent } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [selectedUser, setSelectedUser] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMedication, setSelectedMedication] =
-    useState<ActiveMedication | null>(null);
-  const [quantity, setQuantity] = useState<number>(0);
-  const [isServing, setIsServing] = useState(false);
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [newAppointment, setNewAppointment] = useState<Partial<Appointment>>({
     serviceUser: "",
@@ -69,12 +50,10 @@ const Home = () => {
     status: "Scheduled",
     notes: "",
   });
-  const [notes, setNotes] = useState<string>("");
 
   const { data: serviceUsers = [], isLoading: isLoadingUsers } =
     useServiceUsers();
-  const { data: activeMedications = [], refetch: fetchActiveMedications } =
-    useActiveMedications();
+  const { data: activeMedications = [] } = useActiveMedications();
   const { data: appointments = [], refetch: fetchAppointments } =
     useAppointments();
   const { data: currentUser, isLoading: isLoadingCurrentUser } =
@@ -181,60 +160,17 @@ const Home = () => {
     }
   );
 
+  const formatInstructions = React.useCallback((instructions?: string) => {
+    if (!instructions || instructions.trim() === "") {
+      return "No instructions provided";
+    }
+
+    const trimmed = instructions.trim();
+    return trimmed.length > 80 ? `${trimmed.slice(0, 77)}...` : trimmed;
+  }, []);
+
   const handleUserChange = (event: any) => {
     setSelectedUser(event.target.value);
-  };
-
-  const handleAddStock = (medication: ActiveMedication) => {
-    setSelectedMedication(medication);
-    setIsServing(false);
-    setNotes("");
-    setQuantity(0);
-    setIsModalOpen(true);
-  };
-
-  const handleSubmitStock = async () => {
-    if (!selectedMedication) return;
-
-    try {
-      await activeMedicationApi.update(selectedMedication._id, {
-        quantityInStock: selectedMedication.quantityInStock + quantity,
-        stockChangeNote: notes,
-        notes: notes,
-      });
-      await fetchActiveMedications();
-      setIsModalOpen(false);
-      setQuantity(0);
-      setNotes("");
-    } catch (error) {
-      console.error("Failed to update stock:", error);
-    }
-  };
-
-  const handleDispenseMedication = (medication: ActiveMedication) => {
-    setSelectedMedication(medication);
-    setIsServing(true);
-    setNotes("");
-    setQuantity(medication.quantityPerDose);
-    setIsModalOpen(true);
-  };
-
-  const handleSubmitDispense = async () => {
-    if (!selectedMedication) return;
-
-    try {
-      await activeMedicationApi.update(selectedMedication._id, {
-        quantityInStock: selectedMedication.quantityInStock - quantity,
-        stockChangeNote: notes,
-        notes: notes,
-      });
-      await fetchActiveMedications();
-      setIsModalOpen(false);
-      setQuantity(0);
-      setNotes("");
-    } catch (error) {
-      console.error("Failed to dispense medication:", error);
-    }
   };
 
   const handleAppointmentSubmit = async (e: React.FormEvent) => {
@@ -268,26 +204,6 @@ const Home = () => {
       alert("Failed to create appointment");
     }
   };
-
-  const handleNotesChange = (event: SelectChangeEvent<string>) => {
-    setNotes(event.target.value);
-  };
-
-  const noteOptions = isServing
-    ? [
-        "Medication administered",
-        "Medication leaving the home",
-        "Medication returned to pharmacy",
-        "Medication wasted",
-        "Stock count correction",
-        "Other",
-      ]
-    : [
-        "Stock received from pharmacy",
-        "Medication returned home",
-        "Stock count correction",
-        "Other",
-      ];
 
   return (
     <>
@@ -416,8 +332,18 @@ const Home = () => {
 
         {/* Add profile card */}
         {selectedUser && (
-          <Card sx={{ mb: 4, mt: 4 }}>
-            <CardContent>
+          <Card
+            sx={{
+              mb: 4,
+              mt: 4,
+              p: { xs: 2, sm: 3 },
+              background: "linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%)",
+              borderRadius: "20px",
+              boxShadow: "0 20px 40px rgba(25, 118, 210, 0.12)",
+              border: "1px solid rgba(25, 118, 210, 0.15)",
+            }}
+          >
+            <CardContent sx={{ p: 0 }}>
               <Grid container spacing={{ xs: 2, sm: 3 }}>
                 <Grid
                   item
@@ -428,6 +354,7 @@ const Home = () => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: { xs: "center", sm: "flex-start" },
+                    gap: 2,
                   }}
                 >
                   <Avatar
@@ -435,91 +362,162 @@ const Home = () => {
                       width: { xs: 60, sm: 80 },
                       height: { xs: 60, sm: 80 },
                       bgcolor: "primary.main",
+                      boxShadow: "0 8px 20px rgba(25, 118, 210, 0.35)",
+                      border: "4px solid #ffffff",
                     }}
                   >
                     <PersonIcon sx={{ fontSize: { xs: 30, sm: 40 } }} />
                   </Avatar>
-                  <Typography
-                    variant="h5"
-                    sx={{ 
-                      mt: 2, 
-                      textAlign: { xs: "center", sm: "left" },
-                      color: '#1a1a1a',
-                      fontWeight: 'bold'
+                  <Box sx={{ textAlign: { xs: "center", sm: "left" } }}>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        color: "#0d47a1",
+                        fontWeight: 700,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {serviceUsers.find((u) => u._id === selectedUser)?.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#546e7a", fontWeight: 500, mt: 0.5 }}
+                    >
+                      Service user profile overview
+                    </Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <Box
+                    sx={{
+                      backgroundColor: "rgba(21, 101, 192, 0.08)",
+                      borderRadius: 3,
+                      p: 2,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
                     }}
                   >
-                    {serviceUsers.find((u) => u._id === selectedUser)?.name}
-                  </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "#0d47a1", fontWeight: 700, mb: 1 }}
+                    >
+                      Personal Info
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500 }}
+                    >
+                      NHS Number:&nbsp;
+                      <Box component="span" sx={{ fontWeight: 700 }}>
+                        {
+                          serviceUsers.find((u) => u._id === selectedUser)
+                            ?.nhsNumber
+                        }
+                      </Box>
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500, mt: 0.5 }}
+                    >
+                      DOB:&nbsp;
+                      <Box component="span" sx={{ fontWeight: 700 }}>
+                        {new Date(
+                          serviceUsers.find((u) => u._id === selectedUser)
+                            ?.dateOfBirth || ""
+                        ).toLocaleDateString()}
+                      </Box>
+                    </Typography>
+                  </Box>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography 
-                    variant="body1"
-                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+                  <Box
+                    sx={{
+                      backgroundColor: "rgba(67, 160, 71, 0.08)",
+                      borderRadius: 3,
+                      p: 2,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
                   >
-                    Personal Info:
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: '#424242', fontWeight: 500 }}>
-                    NHS Number:{" "}
-                    {
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.nhsNumber
-                    }
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: '#424242', fontWeight: 500 }}>
-                    DOB:{" "}
-                    {new Date(
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.dateOfBirth || ""
-                    ).toLocaleDateString()}
-                  </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "#1b5e20", fontWeight: 700, mb: 1 }}
+                    >
+                      Address & Contact
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500 }}
+                    >
+                      {serviceUsers.find((u) => u._id === selectedUser)?.address}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500, mt: 0.5 }}
+                    >
+                      Phone:&nbsp;
+                      <Box component="span" sx={{ fontWeight: 700 }}>
+                        {
+                          serviceUsers.find((u) => u._id === selectedUser)
+                            ?.phoneNumber
+                        }
+                      </Box>
+                    </Typography>
+                  </Box>
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={3}>
-                  <Typography 
-                    variant="body1"
-                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
+                  <Box
+                    sx={{
+                      backgroundColor: "rgba(255, 171, 64, 0.12)",
+                      borderRadius: 3,
+                      p: 2,
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
                   >
-                    Address:
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
-                    {serviceUsers.find((u) => u._id === selectedUser)?.address}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
-                    Phone:{" "}
-                    {
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.phoneNumber
-                    }
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography 
-                    variant="body1"
-                    sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
-                  >
-                    Emergency Contact:
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
-                    {
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.emergencyContact.name
-                    }
-                    (
-                    {
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.emergencyContact.relationship
-                    }
-                    )
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#424242', fontWeight: 500 }}>
-                    Phone:{" "}
-                    {
-                      serviceUsers.find((u) => u._id === selectedUser)
-                        ?.emergencyContact.phoneNumber
-                    }
-                  </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "#e65100", fontWeight: 700, mb: 1 }}
+                    >
+                      Emergency Contact
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500 }}
+                    >
+                      {
+                        serviceUsers.find((u) => u._id === selectedUser)
+                          ?.emergencyContact.name
+                      }
+                      {" ("}
+                      {
+                        serviceUsers.find((u) => u._id === selectedUser)
+                          ?.emergencyContact.relationship
+                      }
+                      {")"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#37474f", fontWeight: 500, mt: 0.5 }}
+                    >
+                      Phone:&nbsp;
+                      <Box component="span" sx={{ fontWeight: 700 }}>
+                        {
+                          serviceUsers.find((u) => u._id === selectedUser)
+                            ?.emergencyContact.phoneNumber
+                        }
+                      </Box>
+                    </Typography>
+                  </Box>
                 </Grid>
               </Grid>
             </CardContent>
@@ -544,9 +542,7 @@ const Home = () => {
                   <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Medication Name</TableCell>
                   <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Dosage</TableCell>
                   <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Stock Level</TableCell>
-                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Frequency</TableCell>
-                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Start Date</TableCell>
-                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Prescribed By</TableCell>
+                  <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Administration Times</TableCell>
                   <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Instructions</TableCell>
                   <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
@@ -564,29 +560,60 @@ const Home = () => {
                     <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.medicationName}</TableCell>
                     <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{`${medication.dosage.amount} ${medication.dosage.unit}`}</TableCell>
                     <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.quantityInStock}</TableCell>
-                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.frequency}</TableCell>
                     <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
-                      {new Date(medication.startDate).toLocaleDateString()}
+                      {medication.administrationTimes && medication.administrationTimes.length > 0
+                        ? medication.administrationTimes.join(", ")
+                        : "Not specified"}
                     </TableCell>
-                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.prescribedBy}</TableCell>
-                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>{medication.instructions}</TableCell>
+                    <TableCell sx={{ color: '#424242', fontWeight: 500 }}>
+                      {formatInstructions(medication.instructions)}
+                    </TableCell>
                     <TableCell>
-                      <Tooltip title="Add Stock">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleAddStock(medication)}
-                        >
-                          <AddIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Dispense Medication">
-                        <IconButton
+                      <Stack direction="row" spacing={1.5}>
+                        <Button
+                          variant="contained"
                           color="success"
-                          onClick={() => handleDispenseMedication(medication)}
+                          size="small"
+                          component={Link}
+                          to={`/administration?serviceUser=${selectedUser}&medication=${medication._id}`}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2.5,
+                            py: 1,
+                            boxShadow: "none",
+                            background: "linear-gradient(135deg, #43a047 0%, #2e7d32 100%)",
+                            "&:hover": {
+                              boxShadow: "0 6px 14px rgba(46, 125, 50, 0.35)",
+                              background: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)",
+                            },
+                          }}
                         >
-                          <LocalHospitalIcon />
-                        </IconButton>
-                      </Tooltip>
+                          Dispense
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          component={Link}
+                          to={`/stock-amendment?serviceUser=${selectedUser}&medication=${medication._id}`}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2.5,
+                            py: 1,
+                            borderWidth: 2,
+                            "&:hover": {
+                              borderWidth: 2,
+                              backgroundColor: "rgba(25, 118, 210, 0.08)",
+                            },
+                          }}
+                        >
+                          Adjust Stock
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -687,94 +714,6 @@ const Home = () => {
           </Button>
         )}
       </Box>
-      <Modal
-        open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setNotes("");
-          setQuantity(0);
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", sm: 400 },
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: { xs: 2, sm: 4 },
-            borderRadius: 2,
-          }}
-        >
-          <Typography 
-            variant="h6" 
-            gutterBottom
-            sx={{ color: '#1a1a1a', fontWeight: 'bold' }}
-          >
-            {selectedMedication?.medicationName}
-          </Typography>
-          <TextField
-            fullWidth
-            type="number"
-            label={isServing ? "Quantity to Dispense" : "Quantity to Add"}
-            value={quantity}
-            onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
-            inputProps={{ min: 0 }}
-            sx={{ my: 2 }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel sx={{ color: '#424242', fontWeight: 500 }}>Notes</InputLabel>
-            <Select 
-              value={notes} 
-              onChange={handleNotesChange} 
-              label="Notes"
-              sx={{
-                '& .MuiSelect-select': {
-                  color: '#1a1a1a',
-                  fontWeight: 500
-                }
-              }}
-            >
-              {noteOptions.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            variant="contained"
-            onClick={isServing ? handleSubmitDispense : handleSubmitStock}
-            sx={{ 
-              mr: 1,
-              backgroundColor: '#1976d2',
-              color: '#ffffff',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: '#1565c0',
-                color: '#ffffff'
-              }
-            }}
-          >
-            {isServing ? "Dispense" : "Add Stock"}
-          </Button>
-          <Button 
-            onClick={() => setIsModalOpen(false)}
-            sx={{ 
-              color: '#424242',
-              fontWeight: 500,
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
-                color: '#1a1a1a'
-              }
-            }}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </Modal>
       <Modal
         open={isAppointmentModalOpen}
         onClose={() => setIsAppointmentModalOpen(false)}

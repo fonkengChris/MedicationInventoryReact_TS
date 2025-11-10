@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { activeMedicationApi } from "../services/api";
 import { ActiveMedication } from "../types/models";
@@ -18,6 +18,11 @@ import {
   Typography,
   Box,
   Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Stack,
 } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { Card, CardContent, CardActions, Divider, useMediaQuery } from '@mui/material';
@@ -30,6 +35,9 @@ const AdminActiveMedicationsPage: React.FC = () => {
   >([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedMedicationId, setSelectedMedicationId] = useState<string>("");
+  const [selectedServiceUser, setSelectedServiceUser] = useState<string>("all");
+  const [selectedMedicationName, setSelectedMedicationName] =
+    useState<string>("all");
 
   useEffect(() => {
     const fetchActiveMedications = async () => {
@@ -42,6 +50,57 @@ const AdminActiveMedicationsPage: React.FC = () => {
     };
     fetchActiveMedications();
   }, []);
+
+  const serviceUserOptions = useMemo(() => {
+    const map = new Map<string, string>();
+
+    activeMedications.forEach((medication) => {
+      if (medication.serviceUser && typeof medication.serviceUser === "object") {
+        if (medication.serviceUser._id) {
+          map.set(
+            medication.serviceUser._id,
+            medication.serviceUser.name || "Unnamed service user"
+          );
+        }
+      } else if (typeof medication.serviceUser === "string") {
+        map.set(
+          medication.serviceUser,
+          medication.serviceUser || "Unnamed service user"
+        );
+      }
+    });
+
+    return Array.from(map.entries()).sort((a, b) =>
+      a[1].localeCompare(b[1])
+    );
+  }, [activeMedications]);
+
+  const medicationNameOptions = useMemo(() => {
+    const set = new Set<string>();
+    activeMedications.forEach((medication) => {
+      if (medication.medicationName) {
+        set.add(medication.medicationName);
+      }
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [activeMedications]);
+
+  const filteredActiveMedications = useMemo(() => {
+    return activeMedications.filter((medication) => {
+      const matchesServiceUser =
+        selectedServiceUser === "all" ||
+        (typeof medication.serviceUser === "object" &&
+          medication.serviceUser?._id === selectedServiceUser) ||
+        (typeof medication.serviceUser === "string" &&
+          medication.serviceUser === selectedServiceUser);
+
+      const matchesMedicationName =
+        selectedMedicationName === "all" ||
+        medication.medicationName === selectedMedicationName;
+
+      return matchesServiceUser && matchesMedicationName;
+    });
+  }, [activeMedications, selectedServiceUser, selectedMedicationName]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -78,40 +137,90 @@ const AdminActiveMedicationsPage: React.FC = () => {
           border: '1px solid rgba(255, 255, 255, 0.2)'
         }}
       >
-        <Typography 
-          sx={{ 
-            fontSize: { xs: '1.2rem', sm: '1.5rem' },
-            color: '#1a1a1a',
-            fontWeight: 'bold',
-            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}
+        <Box>
+          <Typography 
+            sx={{ 
+              fontSize: { xs: '1.2rem', sm: '1.5rem' },
+              color: '#1a1a1a',
+              fontWeight: 'bold',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            Active Medications Management
+          </Typography>
+          <Typography sx={{ color: '#546e7a', fontWeight: 500, mt: 0.5 }}>
+            Filter by service user or medication to narrow down results.
+          </Typography>
+        </Box>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'stretch', md: 'center' }}
+          sx={{ width: { xs: '100%', md: 'auto' } }}
         >
-          Active Medications Management
-        </Typography>
-        <Button
-          variant="contained"
-          component={Link}
-          to="/admin/active-medications/new"
-          sx={{
-            width: { xs: '100%', sm: 'auto' },
-            background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
-            color: '#ffffff',
-            fontWeight: 'bold',
-            borderRadius: '8px',
-            px: 3,
-            py: 1.5,
-            textTransform: 'none',
-            boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-            '&:hover': {
-              background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
-              boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
-              transform: 'translateY(-1px)'
-            },
-            transition: 'all 0.2s ease'
-          }}
-        >
-          Add Active Medication
-        </Button>
+          <FormControl
+            size="small"
+            sx={{ minWidth: { xs: '100%', md: 220 } }}
+            disabled={!activeMedications.length}
+          >
+            <InputLabel>Service User</InputLabel>
+            <Select
+              label="Service User"
+              value={selectedServiceUser}
+              onChange={(event) => setSelectedServiceUser(event.target.value)}
+            >
+              <MenuItem value="all">All Service Users</MenuItem>
+              {serviceUserOptions.map(([id, name]) => (
+                <MenuItem key={id} value={id}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl
+            size="small"
+            sx={{ minWidth: { xs: '100%', md: 220 } }}
+            disabled={!activeMedications.length}
+          >
+            <InputLabel>Medication</InputLabel>
+            <Select
+              label="Medication"
+              value={selectedMedicationName}
+              onChange={(event) => setSelectedMedicationName(event.target.value)}
+            >
+              <MenuItem value="all">All Medications</MenuItem>
+              {medicationNameOptions.map((name) => (
+                <MenuItem key={name} value={name}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            component={Link}
+            to="/admin/active-medications/new"
+            sx={{
+              width: { xs: '100%', md: 'auto' },
+              background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+              color: '#ffffff',
+              fontWeight: 'bold',
+              borderRadius: '8px',
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+              '&:hover': {
+                background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
+                boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+                transform: 'translateY(-1px)'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Add Active Medication
+          </Button>
+        </Stack>
       </Box>
 
       {activeMedications.length === 0 ? (
@@ -129,9 +238,27 @@ const AdminActiveMedicationsPage: React.FC = () => {
             No active medications found.
           </Typography>
         </Box>
+      ) : filteredActiveMedications.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '16px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}
+        >
+          <Typography variant="h6" sx={{ color: '#666666', fontWeight: 500 }}>
+            No active medications match your current filters.
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#9e9e9e', mt: 1 }}>
+            Try selecting a different service user or medication.
+          </Typography>
+        </Box>
       ) : isMobile ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {activeMedications.map((medication) => (
+          {filteredActiveMedications.map((medication) => (
             <Card
               key={medication._id}
               sx={{
@@ -177,6 +304,11 @@ const AdminActiveMedicationsPage: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
                   <span style={{ fontWeight: 600 }}>Dosage:</span> {`${medication.dosage.amount} ${medication.dosage.unit}`}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
+                  <span style={{ fontWeight: 600 }}>Administration Times:</span> {medication.administrationTimes && medication.administrationTimes.length
+                    ? medication.administrationTimes.join(', ')
+                    : 'Not specified'}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
@@ -298,6 +430,9 @@ const AdminActiveMedicationsPage: React.FC = () => {
                   Days Remaining
                 </TableCell>
                 <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
+                  Administration Times
+                </TableCell>
+                <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
                   Status
                 </TableCell>
                 <TableCell sx={{ color: '#1a1a1a', fontWeight: 'bold', fontSize: '1rem' }}>
@@ -306,7 +441,7 @@ const AdminActiveMedicationsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {activeMedications.map((medication) => (
+              {filteredActiveMedications.map((medication) => (
                 <TableRow 
                   key={medication._id}
                   sx={{
@@ -346,6 +481,11 @@ const AdminActiveMedicationsPage: React.FC = () => {
                   </TableCell>
                   <TableCell sx={{ color: '#666666' }}>
                     {medication.daysRemaining}
+                  </TableCell>
+                  <TableCell sx={{ color: '#666666' }}>
+                    {medication.administrationTimes && medication.administrationTimes.length
+                      ? medication.administrationTimes.join(', ')
+                      : 'Not specified'}
                   </TableCell>
                   <TableCell>
                     <Chip

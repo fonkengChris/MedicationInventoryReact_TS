@@ -9,6 +9,9 @@ import {
   Appointment,
   Group,
   WeeklySummary,
+  AdministrationSettings,
+  MarData,
+  MedicationAdministrationRecord,
 } from "../types/models";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
@@ -119,7 +122,6 @@ export const userApi = {
   update: (id: string, user: Partial<User>) =>
     api.put<User>(`/users/${id}`, user),
   delete: (id: string) => api.delete(`/users/${id}`),
-  updateFcmToken: (token: string) => api.post("/users/fcm-token", { token }),
 };
 
 export const appointmentApi = {
@@ -178,5 +180,59 @@ export const weeklySummariesApi = {
     api.get<WeeklySummary["summaries"]>(
       `/summaries/service-user/${serviceUserId}`,
       { params }
+    ),
+};
+
+export const marApi = {
+  getData: (
+    serviceUserId: string,
+    params: { startDate: string; endDate: string; groupId?: string }
+  ) =>
+    api.get<{ success: boolean; data: MarData }>(`/mar/${serviceUserId}`, {
+      params,
+    }),
+  downloadPdf: (
+    serviceUserId: string,
+    params: { startDate: string; endDate: string; groupId?: string }
+  ) =>
+    api.get(`/mar/${serviceUserId}/pdf`, {
+      params,
+      responseType: "blob",
+    }),
+};
+
+export const administrationApi = {
+  getAvailability: (
+    serviceUserId: string,
+    params?: { date?: string; now?: string; groupId?: string }
+  ) =>
+    api.get(`/mar/${serviceUserId}/availability`, {
+      params,
+    }),
+  dispense: (serviceUserId: string, payload: {
+    medicationId: string;
+    quantity: number;
+    timestamp?: string;
+    notes?: string;
+    groupId?: string;
+  }) =>
+    api.post<{ success: boolean; message: string; data: MedicationAdministrationRecord }>(
+      `/mar/${serviceUserId}/dispense`,
+      payload
+    ),
+  getSettings: (params?: { groupId?: string }) =>
+    api.get<{ success: boolean; data: AdministrationSettings }>(
+      "/mar/settings/current",
+      { params }
+    ),
+  updateSettings: (payload: {
+    scope: "global" | "group";
+    groupId?: string;
+    thresholdBefore: number;
+    thresholdAfter: number;
+  }) =>
+    api.put<{ success: boolean; message: string; data: AdministrationSettings }>(
+      "/mar/settings",
+      payload
     ),
 };

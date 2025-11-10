@@ -20,79 +20,19 @@ import AdminAppointmentForm from "./pages/AdminAppointmentForm";
 import AdminGroupsPage from "./pages/AdminGroupsPage";
 import AdminGroupForm from "./pages/AdminGroupForm";
 import AdminUserForm from "./pages/AdminUserForm";
-import { messaging, getToken } from "./firebase";
-import { userApi } from "./services/api";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { onMessage } from "firebase/messaging";
 import AppointmentList from "./pages/AppointmentList";
 import MedicationDetails from "./pages/MedicationDetails";
 import AdminWeeklySummariesPage from "./pages/AdminWeeklySummariesPage";
+import AdminMarPage from "./pages/AdminMarPage";
+import AdminAdministrationPage from "./pages/AdminAdministrationPage";
+import AdminAdministrationSettingsPage from "./pages/AdminAdministrationSettingsPage";
+import StockAmendmentPage from "./pages/StockAmendmentPage";
 // import { MedicationTrends } from "./pages/AdminMedicationTrends";
 
 // Create a client
 const queryClient = new QueryClient();
 
 function App() {
-  useEffect(() => {
-    const auth = getAuth();
-
-    const requestPermissionAndFetchToken = async () => {
-      try {
-        if (!auth.currentUser) {
-          console.log("User not authenticated. Skipping FCM token request.");
-          return;
-        }
-
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          const token = await getToken(messaging, {
-            vapidKey:
-              "BPVvL_REPLACE_WITH_YOUR_ACTUAL_VAPID_KEY_FROM_FIREBASE_CONSOLE",
-            serviceWorkerRegistration:
-              await navigator.serviceWorker.getRegistration(
-                "/firebase-messaging-sw.js"
-              ),
-          });
-          if (token) {
-            console.log("Development FCM Token:", token);
-            await userApi.updateFcmToken(token);
-          }
-        } else {
-          console.error("Notification permission not granted");
-        }
-      } catch (error) {
-        console.error("Error fetching FCM token:", error);
-      }
-    };
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        requestPermissionAndFetchToken();
-      }
-    });
-
-    // Set up foreground message handler
-    const onMessageUnsubscribe = onMessage(messaging, (payload) => {
-      console.log("Received foreground message:", payload);
-
-      // Show notification even when app is in foreground
-      if (payload.notification) {
-        new Notification(payload.notification.title || "New Message", {
-          body: payload.notification.body,
-          icon: "/firebase-logo.png",
-        });
-      }
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.log("Running in development mode");
-    }
-
-    return () => {
-      unsubscribe();
-      onMessageUnsubscribe();
-    };
-  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -105,6 +45,8 @@ function App() {
             <Route path="/appointments" element={<AppointmentList />} />
             <Route path="/medications" element={<MedicationList />} />
             <Route path="/medications/:id" element={<MedicationDetails />} />
+            <Route path="/administration" element={<AdminAdministrationPage />} />
+          <Route path="/stock-amendment" element={<StockAmendmentPage />} />
           </Route>
           <Route path="admin" element={<AdminPage />}>
             <Route path="medications" element={<AdminMedicationsPage />} />
@@ -152,6 +94,11 @@ function App() {
             <Route
               path="weekly-summaries"
               element={<AdminWeeklySummariesPage />}
+            />
+            <Route path="mar" element={<AdminMarPage />} />
+            <Route
+              path="administration/settings"
+              element={<AdminAdministrationSettingsPage />}
             />
             {/* <Route path="medication-trends" element={<MedicationTrends />} /> */}
           </Route>

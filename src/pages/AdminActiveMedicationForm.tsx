@@ -25,6 +25,8 @@ interface DecodedToken {
   role: string;
 }
 
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
 const AdminActiveMedicationForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -43,6 +45,7 @@ const AdminActiveMedicationForm: React.FC = () => {
     quantityInStock: 0,
     quantityPerDose: 0,
     dosesPerDay: 1,
+    administrationTimes: [],
     frequency: "",
     startDate: new Date().toISOString().split("T")[0],
     endDate: "",
@@ -50,6 +53,7 @@ const AdminActiveMedicationForm: React.FC = () => {
     notes: "",
     isActive: true,
   });
+  const [newAdministrationTime, setNewAdministrationTime] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +88,7 @@ const AdminActiveMedicationForm: React.FC = () => {
             endDate: medication.endDate
               ? new Date(medication.endDate).toISOString().split("T")[0]
               : "",
+            administrationTimes: medication.administrationTimes || [],
           });
         } catch (error) {
           console.error("Error fetching active medication:", error);
@@ -151,6 +156,36 @@ const AdminActiveMedicationForm: React.FC = () => {
         [name]: inputType === "number" ? Number(value) : value,
       }));
     }
+  };
+
+  const handleAddAdministrationTime = () => {
+    const trimmed = newAdministrationTime.trim();
+    if (!trimmed) return;
+    if (!timeRegex.test(trimmed)) {
+      alert("Please enter a valid time in HH:mm format");
+      return;
+    }
+    setActiveMedication((prev) => {
+      const times = prev.administrationTimes || [];
+      if (times.includes(trimmed)) {
+        alert("Time already added");
+        return prev;
+      }
+      return {
+        ...prev,
+        administrationTimes: [...times, trimmed].sort(),
+      };
+    });
+    setNewAdministrationTime("");
+  };
+
+  const handleRemoveAdministrationTime = (time: string) => {
+    setActiveMedication((prev) => ({
+      ...prev,
+      administrationTimes: (prev.administrationTimes || []).filter(
+        (item) => item !== time
+      ),
+    }));
   };
 
   const handleActivationToggle = async (newActiveState: boolean) => {
@@ -425,6 +460,67 @@ const AdminActiveMedicationForm: React.FC = () => {
                   }
                 }}
               />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" sx={{ mb: 1, color: "#1a1a1a" }}>
+                Administration Times (HH:mm)
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
+                <TextField
+                  label="Add time"
+                  placeholder="08:00"
+                  value={newAdministrationTime}
+                  onChange={(event) => setNewAdministrationTime(event.target.value)}
+                  sx={{
+                    width: { xs: "100%", sm: "160px" },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#e0e0e0",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#1976d2",
+                    },
+                  }}
+                  inputProps={{ maxLength: 5 }}
+                />
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={handleAddAdministrationTime}
+                  sx={{
+                    background: "linear-gradient(90deg, #1976d2 0%, #1565c0 100%)",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    borderRadius: "8px",
+                    px: 3,
+                    py: 1.2,
+                    textTransform: "none",
+                    boxShadow: "0 4px 12px rgba(25, 118, 210, 0.25)",
+                    "&:hover": {
+                      background: "linear-gradient(90deg, #1565c0 0%, #1976d2 100%)",
+                      boxShadow: "0 6px 20px rgba(25, 118, 210, 0.35)",
+                    },
+                  }}
+                >
+                  Add Time
+                </Button>
+              </Box>
+              <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {(activeMedication.administrationTimes || []).map((time) => (
+                  <Chip
+                    key={time}
+                    label={time}
+                    onDelete={() => handleRemoveAdministrationTime(time)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                ))}
+                {!(activeMedication.administrationTimes || []).length && (
+                  <Typography variant="body2" color="textSecondary">
+                    No administration times added yet.
+                  </Typography>
+                )}
+              </Box>
             </Grid>
 
             <Grid item xs={12}>

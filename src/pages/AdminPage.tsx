@@ -148,6 +148,22 @@ const AdminPage: React.FC = () => {
                   <FiBarChart2 className="mr-3 text-lg" />
                   <span className="font-medium">Weekly Summaries</span>
                 </Link>
+                <Link
+                  to="/admin/mar"
+                  className="flex items-center text-white hover:text-blue-200 py-3 px-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-all duration-200"
+                  onClick={closeSidebar}
+                >
+                  <FiTrendingUp className="mr-3 text-lg" />
+                  <span className="font-medium">MAR Charts</span>
+                </Link>
+                <Link
+                  to="/admin/administration/settings"
+                  className="flex items-center text-white hover:text-blue-200 py-3 px-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-all duration-200"
+                  onClick={closeSidebar}
+                >
+                  <FiClock className="mr-3 text-lg" />
+                  <span className="font-medium">Admin Windows</span>
+                </Link>
                 {decodedToken.role === "superAdmin" && (
                   <>
                     <div className="border-t border-white border-opacity-20 my-4"></div>

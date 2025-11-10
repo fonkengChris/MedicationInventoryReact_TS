@@ -51,6 +51,7 @@ export interface ActiveMedication {
   quantityInStock: number;
   quantityPerDose: number;
   dosesPerDay: number;
+  administrationTimes?: string[];
   frequency: string;
   startDate: string;
   endDate?: string;
@@ -90,6 +91,7 @@ export interface MedicationUpdate {
     | "Prescriber Change"
     | "Dosage Change"
     | "Frequency Change"
+    | "Administration Times Change"
     | "Notes Change"
     | "Activated"
     | "Deactivated";
@@ -239,5 +241,56 @@ export interface WeeklySummary {
   }[];
   createdAt: string;
   __v: number;
+}
+
+export interface AdministrationSettings {
+  _id?: string;
+  scope: "global" | "group";
+  group?: string | Group;
+  thresholdBefore: number;
+  thresholdAfter: number;
+  updatedBy: string;
+  updatedAt?: string;
+  createdAt?: string;
+}
+
+export interface AdministrationWindow {
+  medicationId: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  windowStart: string;
+  windowEnd: string;
+}
+
+export interface MedicationAdministrationRecord {
+  _id?: string;
+  medication: string | ActiveMedication;
+  serviceUser: string | ServiceUser;
+  scheduledDate: string;
+  scheduledTime: string;
+  administeredAt: string;
+  administeredBy: string | User;
+  quantity: number;
+  status: "on-time" | "early" | "late" | "missed" | "cancelled" | "recorded";
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface MarData {
+  serviceUser: ServiceUser | null;
+  medications: ActiveMedication[];
+  administrations: {
+    [medicationId: string]: {
+      [date: string]: MedicationAdministrationRecord[];
+    };
+  };
+  windows: {
+    [medicationId: string]: {
+      [date: string]: AdministrationWindow[];
+    };
+  };
+  settings: AdministrationSettings;
+  dateRange: string[];
 }
 

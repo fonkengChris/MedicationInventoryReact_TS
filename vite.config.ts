@@ -16,7 +16,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
-          firebase: ["firebase/app", "firebase/auth", "firebase/messaging"],
           mui: ["@mui/material", "@mui/icons-material"],
         },
       },
@@ -29,5 +28,14 @@ export default defineConfig({
   preview: {
     port: 3000,
     host: true,
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
+    css: true,
+    coverage: {
+      reporter: ["text", "html", "lcov"],
+    },
   },
 });
