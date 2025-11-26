@@ -14,6 +14,8 @@ import AdminServiceUserForm from "./pages/AdminServiceUserForm";
 import AdminActiveMedicationsPage from "./pages/AdminActiveMedicationsPage";
 import AdminActiveMedicationForm from "./pages/AdminActiveMedicationForm";
 import AdminMedicationUpdatesPage from "./pages/AdminMedicationUpdatesPage";
+import QuantitativeUpdatesPage from "./pages/QuantitativeUpdatesPage";
+import QualitativeUpdatesPage from "./pages/QualitativeUpdatesPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminAppointmentsPage from "./pages/AdminAppointmentsPage";
 import AdminAppointmentForm from "./pages/AdminAppointmentForm";
@@ -79,6 +81,14 @@ function App() {
             <Route
               path="medication-updates"
               element={<AdminMedicationUpdatesPage />}
+            />
+            <Route
+              path="quantitative-updates"
+              element={<QuantitativeUpdatesPage />}
+            />
+            <Route
+              path="qualitative-updates"
+              element={<QualitativeUpdatesPage />}
             />
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="users/edit/:id" element={<AdminUserForm />} />

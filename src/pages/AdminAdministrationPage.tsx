@@ -38,6 +38,7 @@ const AdminAdministrationPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [quantityToDispense, setQuantityToDispense] = useState<number>(1);
+  const [administrationOutcome, setAdministrationOutcome] = useState<string>("");
   const [administrationNotes, setAdministrationNotes] = useState<string>("");
   const [selectedMedication, setSelectedMedication] =
     useState<AvailabilityMedication | null>(null);
@@ -194,6 +195,7 @@ const AdminAdministrationPage: React.FC = () => {
     setSelectedMedication(item);
     setQuantityToDispense(item.medication.quantityPerDose ?? 1);
     setAdministrationNotes("");
+    setAdministrationOutcome(""); // Reset outcome when opening dialog
   };
 
   const handleDispense = async () => {
@@ -215,11 +217,13 @@ const AdminAdministrationPage: React.FC = () => {
         medicationId: selectedMedication.medication._id,
         quantity: quantityToDispense,
         notes: noteToSubmit,
+        outcome: administrationOutcome || undefined, // Only send if selected
       });
       setSuccessMessage("Administration recorded successfully");
       setSelectedMedication(null);
       setAdministrationNotes("");
       setQuantityToDispense(1);
+      setAdministrationOutcome("");
       fetchAvailability();
     } catch (err: any) {
       console.error("Failed to record administration", err);
@@ -428,6 +432,30 @@ const AdminAdministrationPage: React.FC = () => {
             sx={{ mb: 2 }}
             inputProps={{ min: 0 }}
           />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="outcome-select-label">Outcome (MAR Code)</InputLabel>
+            <Select
+              labelId="outcome-select-label"
+              label="Outcome (MAR Code)"
+              value={administrationOutcome}
+              onChange={(event) => setAdministrationOutcome(event.target.value)}
+            >
+              <MenuItem value="">
+                <em>Administered (default - timing based)</em>
+              </MenuItem>
+              <MenuItem value="refused">R - Refused</MenuItem>
+              <MenuItem value="nausea_vomiting">N - Nausea/Vomiting</MenuItem>
+              <MenuItem value="hospital">H - Hospital</MenuItem>
+              <MenuItem value="on_leave">L - On Leave</MenuItem>
+              <MenuItem value="destroyed">D - Destroyed</MenuItem>
+              <MenuItem value="sleeping">S - Sleeping</MenuItem>
+              <MenuItem value="pulse_abnormal">P - Pulse Abnormal</MenuItem>
+              <MenuItem value="not_required">NR - Not Required</MenuItem>
+              <MenuItem value="missed">Missed</MenuItem>
+              <MenuItem value="cancelled">Cancelled</MenuItem>
+              <MenuItem value="other">O - Other</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             label="Notes"
             multiline
@@ -435,6 +463,11 @@ const AdminAdministrationPage: React.FC = () => {
             fullWidth
             value={administrationNotes}
             onChange={(event) => setAdministrationNotes(event.target.value)}
+            placeholder={
+              administrationOutcome
+                ? "Add additional details about this outcome..."
+                : "Add notes about the administration..."
+            }
           />
         </DialogContent>
         <DialogActions>

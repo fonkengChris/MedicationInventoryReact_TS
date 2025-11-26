@@ -95,6 +95,7 @@ export interface MedicationUpdate {
     | "Notes Change"
     | "Activated"
     | "Deactivated";
+  category: "quantitative" | "qualitative";
   changes: {
     [key: string]: {
       oldValue: any;

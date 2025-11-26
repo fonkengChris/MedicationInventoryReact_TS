@@ -89,7 +89,20 @@ export const activeMedicationApi = {
 };
 
 export const medicationUpdateApi = {
-  getAll: () => api.get<MedicationUpdate[]>("/updates"),
+  getAll: (params?: { category?: "quantitative" | "qualitative" }) =>
+    api.get<MedicationUpdate[]>("/updates", { params }),
+  getQuantitative: (params?: {
+    medicationId?: string;
+    userId?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => api.get<MedicationUpdate[]>("/updates/quantitative", { params }),
+  getQualitative: (params?: {
+    medicationId?: string;
+    userId?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => api.get<MedicationUpdate[]>("/updates/qualitative", { params }),
   getByMedication: (medicationId: string) =>
     api.get<MedicationUpdate[]>(`/updates/medication/${medicationId}`),
   getByUser: (userId: string) =>
@@ -100,10 +113,12 @@ export const medicationUpdateApi = {
     medicationId?: string;
     userId?: string;
     dateRange?: DateRangeFilter;
+    category?: "quantitative" | "qualitative";
   }) => {
     const params: any = {};
     if (filters.medicationId) params.medicationId = filters.medicationId;
     if (filters.userId) params.userId = filters.userId;
+    if (filters.category) params.category = filters.category;
     if (filters.dateRange) {
       params.startDate = filters.dateRange.startDate;
       params.endDate = filters.dateRange.endDate;
@@ -215,6 +230,7 @@ export const administrationApi = {
     timestamp?: string;
     notes?: string;
     groupId?: string;
+    outcome?: string;
   }) =>
     api.post<{ success: boolean; message: string; data: MedicationAdministrationRecord }>(
       `/mar/${serviceUserId}/dispense`,

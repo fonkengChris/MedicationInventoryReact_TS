@@ -138,7 +138,23 @@ const AdminPage: React.FC = () => {
                   onClick={closeSidebar}
                 >
                   <FiActivity className="mr-3 text-lg" />
-                  <span className="font-medium">Medication Updates</span>
+                  <span className="font-medium">All Updates</span>
+                </Link>
+                <Link
+                  to="/admin/quantitative-updates"
+                  className="flex items-center text-white hover:text-blue-200 py-3 px-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-all duration-200 ml-4"
+                  onClick={closeSidebar}
+                >
+                  <FiTrendingUp className="mr-3 text-lg" />
+                  <span className="font-medium">Quantitative Updates</span>
+                </Link>
+                <Link
+                  to="/admin/qualitative-updates"
+                  className="flex items-center text-white hover:text-blue-200 py-3 px-4 rounded-lg hover:bg-white hover:bg-opacity-10 transition-all duration-200 ml-4"
+                  onClick={closeSidebar}
+                >
+                  <FiClock className="mr-3 text-lg" />
+                  <span className="font-medium">Qualitative Updates</span>
                 </Link>
                 <Link
                   to="/admin/weekly-summaries"

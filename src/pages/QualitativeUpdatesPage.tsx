@@ -28,7 +28,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { Card, CardContent, CardActions, Divider, useMediaQuery } from '@mui/material';
 
-const AdminMedicationUpdatesPage: React.FC = () => {
+const QualitativeUpdatesPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [updates, setUpdates] = useState<MedicationUpdate[]>([]);
@@ -75,18 +75,16 @@ const AdminMedicationUpdatesPage: React.FC = () => {
     try {
       setIsLoading(true);
       
-      // Check if we have any filters
-      const hasFilters = filter.medicationId || filter.userId || filter.dateRange;
-      
-      if (hasFilters) {
-        // Use the new filtered endpoint that can handle multiple filters
-        const response = await medicationUpdateApi.getFiltered(filter);
-        setUpdates(response.data);
-      } else {
-        // No filters, get all updates
-        const response = await medicationUpdateApi.getAll();
-        setUpdates(response.data);
+      const params: any = {};
+      if (filter.medicationId) params.medicationId = filter.medicationId;
+      if (filter.userId) params.userId = filter.userId;
+      if (filter.dateRange) {
+        params.startDate = filter.dateRange.startDate;
+        params.endDate = filter.dateRange.endDate;
       }
+      
+      const response = await medicationUpdateApi.getQualitative(params);
+      setUpdates(response.data);
     } catch (error) {
       console.error("Error fetching updates:", error);
       setError(
@@ -103,7 +101,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
 
   const validateDateRange = (startDate: string, endDate: string): string | null => {
     if (!startDate && !endDate) {
-      return null; // Both empty is valid (no date filter)
+      return null;
     }
     
     if (!startDate || !endDate) {
@@ -132,7 +130,6 @@ const AdminMedicationUpdatesPage: React.FC = () => {
       return;
     }
 
-    // Update filter while preserving other filters
     setFilter(prevFilter => ({
       ...prevFilter,
       dateRange: dateInputs.startDate && dateInputs.endDate ? {
@@ -166,13 +163,25 @@ const AdminMedicationUpdatesPage: React.FC = () => {
     switch (updateType) {
       case "New Medication":
         return { bg: '#e8f5e8', color: '#2e7d32' };
-      case "MedStock Increase":
-        return { bg: '#e3f2fd', color: '#1976d2' };
-      case "MedStock Decrease":
-        return { bg: '#fff3e0', color: '#f57c00' };
+      case "Name Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Dosage Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Frequency Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Administration Times Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Prescriber Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Service User Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
+      case "Instructions Change":
+        return { bg: '#f3e5f5', color: '#7b1fa2' };
       case "Activated":
         return { bg: '#e8f5e8', color: '#2e7d32' };
       case "Deactivated":
+        return { bg: '#ffebee', color: '#c62828' };
+      case "Deleted":
         return { bg: '#ffebee', color: '#c62828' };
       default:
         return { bg: '#f3e5f5', color: '#7b1fa2' };
@@ -198,7 +207,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
         p: { xs: 2, sm: 2, md: 3 },
         maxWidth: "100%",
         overflow: "hidden",
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        background: 'linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)',
         minHeight: '100vh'
       }}
     >
@@ -218,12 +227,12 @@ const AdminMedicationUpdatesPage: React.FC = () => {
         <Typography 
           sx={{ 
             fontSize: { xs: '1.2rem', sm: '1.5rem' },
-            color: '#1a1a1a',
+            color: '#7b1fa2',
             fontWeight: 'bold',
             textShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}
         >
-          All Medication Updates History
+          Qualitative Updates (Other Changes)
         </Typography>
       </Box>
 
@@ -254,7 +263,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                   borderColor: '#e0e0e0'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1976d2'
+                  borderColor: '#7b1fa2'
                 }
               }}
             >
@@ -281,7 +290,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                   borderColor: '#e0e0e0'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#1976d2'
+                  borderColor: '#7b1fa2'
                 }
               }}
             >
@@ -307,7 +316,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 borderColor: '#e0e0e0'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#1976d2'
+                borderColor: '#7b1fa2'
               }
             }}
           />
@@ -324,13 +333,12 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 borderColor: '#e0e0e0'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#1976d2'
+                borderColor: '#7b1fa2'
               }
             }}
           />
         </Box>
 
-        {/* Date Error Alert */}
         {dateError && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {dateError}
@@ -343,17 +351,17 @@ const AdminMedicationUpdatesPage: React.FC = () => {
             onClick={handleDateRangeFilter}
             disabled={!dateInputs.startDate || !dateInputs.endDate}
             sx={{
-              background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+              background: 'linear-gradient(90deg, #7b1fa2 0%, #6a1b9a 100%)',
               color: '#ffffff',
               fontWeight: 'bold',
               borderRadius: '8px',
               px: 3,
               py: 1.5,
               textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+              boxShadow: '0 4px 12px rgba(123, 31, 162, 0.3)',
               '&:hover': {
-                background: 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)',
-                boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+                background: 'linear-gradient(90deg, #6a1b9a 0%, #7b1fa2 100%)',
+                boxShadow: '0 6px 20px rgba(123, 31, 162, 0.4)',
                 transform: 'translateY(-1px)'
               },
               '&:disabled': {
@@ -381,8 +389,8 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 py: 1.5,
                 textTransform: 'none',
                 '&:hover': {
-                  borderColor: '#1976d2',
-                  color: '#1976d2',
+                  borderColor: '#7b1fa2',
+                  color: '#7b1fa2',
                   backgroundColor: '#f5f5f5'
                 },
                 transition: 'all 0.2s ease'
@@ -408,8 +416,8 @@ const AdminMedicationUpdatesPage: React.FC = () => {
               py: 1.5,
               textTransform: 'none',
               '&:hover': {
-                borderColor: '#1976d2',
-                color: '#1976d2',
+                borderColor: '#7b1fa2',
+                color: '#7b1fa2',
                 backgroundColor: '#f5f5f5'
               },
               transition: 'all 0.2s ease'
@@ -433,7 +441,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
           }}
         >
           <Typography variant="h6" sx={{ color: '#666666', fontWeight: 500 }}>
-            No updates found.
+            No qualitative updates found.
           </Typography>
         </Box>
       ) : isMobile ? (
@@ -452,7 +460,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                 '&:hover': { 
                   transform: 'translateY(-4px)',
                   boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-                  borderColor: '#1976d2'
+                  borderColor: '#7b1fa2'
                 },
                 '&::before': {
                   content: '""',
@@ -462,10 +470,9 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                   right: 0,
                   height: '4px',
                   background: update.updateType === 'New Medication' ? 'linear-gradient(90deg, #43a047 0%, #66bb6a 100%)' :
-                    update.updateType === 'MedStock Increase' ? 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)' :
-                    update.updateType === 'MedStock Decrease' ? 'linear-gradient(90deg, #fbc02d 0%, #ffd54f 100%)' :
                     update.updateType === 'Activated' ? 'linear-gradient(90deg, #43a047 0%, #66bb6a 100%)' :
-                    update.updateType === 'Deactivated' ? 'linear-gradient(90deg, #e53935 0%, #ef5350 100%)' : 'linear-gradient(90deg, #7e57c2 0%, #9575cd 100%)',
+                    update.updateType === 'Deactivated' ? 'linear-gradient(90deg, #e53935 0%, #ef5350 100%)' :
+                    'linear-gradient(90deg, #7e57c2 0%, #9575cd 100%)',
                   zIndex: 1
                 }
               }}
@@ -500,17 +507,6 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                       fontSize: '0.75rem'
                     }}
                   />
-                  <Chip
-                    label={update.category === 'quantitative' ? 'Quantitative' : 'Qualitative'}
-                    size="small"
-                    sx={{
-                      ml: 1,
-                      backgroundColor: update.category === 'quantitative' ? '#e3f2fd' : '#f3e5f5',
-                      color: update.category === 'quantitative' ? '#1976d2' : '#7b1fa2',
-                      fontWeight: 'bold',
-                      fontSize: '0.7rem'
-                    }}
-                  />
                 </Box>
                 <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 600, color: '#1a1a1a' }}>Changes:</Typography>
                 <Box sx={{
@@ -541,9 +537,22 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                       )
                     : <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>{String(update.changes)}</Typography>}
                 </Box>
-                <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
-                  <span style={{ fontWeight: 600 }}>Notes:</span> {update.notes}
-                </Typography>
+                {update.notes && (
+                  <Box sx={{
+                    background: '#f3e5f5',
+                    borderRadius: 2,
+                    padding: 1.5,
+                    marginBottom: 1,
+                    borderLeft: '4px solid #7b1fa2'
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#7b1fa2', mb: 0.5 }}>
+                      Note:
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#424242' }}>
+                      {update.notes}
+                    </Typography>
+                  </Box>
+                )}
                 <Typography variant="body2" sx={{ mb: 1, color: '#666666' }}>
                   <span style={{ fontWeight: 600 }}>Timestamp:</span> {new Date(update.timestamp).toLocaleString()}
                 </Typography>
@@ -624,7 +633,7 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                   <th>User</th>
                   <th>Type</th>
                   <th>Changes</th>
-                  <th>Notes</th>
+                  <th>Note</th>
                   <th>Timestamp</th>
                   <th>Actions</th>
                 </tr>
@@ -641,28 +650,16 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                         "Unknown User"}
                     </td>
                     <td>
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        <Chip
-                          label={update.updateType}
-                          size="small"
-                          sx={{
-                            backgroundColor: getUpdateTypeColor(update.updateType).bg,
-                            color: getUpdateTypeColor(update.updateType).color,
-                            fontWeight: 'bold',
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                        <Chip
-                          label={update.category === 'quantitative' ? 'Quantitative' : 'Qualitative'}
-                          size="small"
-                          sx={{
-                            backgroundColor: update.category === 'quantitative' ? '#e3f2fd' : '#f3e5f5',
-                            color: update.category === 'quantitative' ? '#1976d2' : '#7b1fa2',
-                            fontWeight: 'bold',
-                            fontSize: '0.65rem'
-                          }}
-                        />
-                      </Box>
+                      <Chip
+                        label={update.updateType}
+                        size="small"
+                        sx={{
+                          backgroundColor: getUpdateTypeColor(update.updateType).bg,
+                          color: getUpdateTypeColor(update.updateType).color,
+                          fontWeight: 'bold',
+                          fontSize: '0.75rem'
+                        }}
+                      />
                     </td>
                     <td>
                       <Box sx={{ maxWidth: '200px' }}>
@@ -685,10 +682,19 @@ const AdminMedicationUpdatesPage: React.FC = () => {
                           )}
                       </Box>
                     </td>
-                    <td style={{ color: '#666666', fontSize: '0.875rem' }}>
-                      {update.updateType.includes("MedStock")
-                        ? update.notes
-                        : "N/A"}
+                    <td style={{ color: '#666666', fontSize: '0.875rem', maxWidth: '250px' }}>
+                      {update.notes ? (
+                        <Box sx={{
+                          background: '#f3e5f5',
+                          padding: 1,
+                          borderRadius: 1,
+                          borderLeft: '3px solid #7b1fa2'
+                        }}>
+                          {update.notes}
+                        </Box>
+                      ) : (
+                        'N/A'
+                      )}
                     </td>
                     <td style={{ color: '#666666', fontSize: '0.875rem' }}>
                       {new Date(update.timestamp).toLocaleString()}
@@ -785,4 +791,5 @@ const AdminMedicationUpdatesPage: React.FC = () => {
   );
 };
 
-export default AdminMedicationUpdatesPage;
+export default QualitativeUpdatesPage;
+
